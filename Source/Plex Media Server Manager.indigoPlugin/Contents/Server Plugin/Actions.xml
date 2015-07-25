@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<Actions>
+	<Action id="downloadCurrentlyPlayingArt" deviceFilter="self.plexMediaClient">
+		<Name>Download Currently Playing Art</Name>
+		<CallbackMethod>downloadCurrentlyPlayingArt</CallbackMethod>
+		<ConfigUI>
+			<Field id="actionTitle" type="label" fontColor="darkGray">
+				<Label>DOWNLOAD CURRENTLY PLAYING ART</Label>
+			</Field>
+			<Field id="instructionSeparator1" type="separator" />
+			<Field id="instructions" type="label" fontSize="small">
+				<Label>This action allows you to retrieve the selected Plex art image for the currently-playing media item.</Label>
+			</Field>
+			<Field id="artElement" type="menu">
+				<Label>Art to Download:</Label>
+				<List>
+					<Option value="art">Primary Art</Option>
+					<Option value="thumb">Thumbnail Art</Option>
+					<Option value="parentThumb">Parent (Season) Thumbnail</Option>
+					<Option value="grandparentArt">Grandparent (Show) Art</Option>
+					<Option value="grandparentThumb">Grandparent (Show) Thumbnail Art</Option>
+				</List>
+			</Field>
+			<Field id="saveToFilename" type="textfield">
+				<Label>Save to Filename:</Label>
+			</Field>
+			<Field id="noArtworkFilename" type="textfield">
+				<Label>No Current Media Filename:</Label>
+			</Field>
+			<Field id="noArtInstructions" type="label" fontSize="small" alignWithControl="true">
+				<Label>[OPTIONAL] If no media is playing (e.g. the client is disconnected), this file will be saved to the destination filename, allowing refreshing images to still display an image on your control page.</Label>
+			</Field>
+		</ConfigUI>
+	</Action>
+</Actions>
