@@ -12,11 +12,28 @@
 			<Field id="deviceSelectionInstructions" type="label" fontSize="small">
 				<Label>Please enter the IP address (or hostname) and the port for the server.</Label>
 			</Field>
+			<Field id="requestMethod" type="menu">
+				<Label>Method:</Label>
+				<List>
+					<Option value="http">Standard - http</Option>
+					<Option value="https">Secure - https</Option>
+				</List>
+			</Field>
 			<Field id="httpAddress" type="textfield">
 				<Label>Hostname or IP Address:</Label>	
 			</Field>
 			<Field id="httpPort" type="textfield" defaultValue="32400">
 				<Label>Port:</Label>
+			</Field>
+			<Field id="loginRequired" type="checkbox" defaultValue="false">
+				<Label>Login Required:</Label>
+				<Description>Check if your server requires authentication</Description>
+			</Field>
+			<Field id="plexUsername" type="textfield" enabledBindingId="loginRequired">
+				<Label>Username:</Label>	
+			</Field>
+			<Field id="plexPassword" type="textfield" enabledBindingId="loginRequired">
+				<Label>Password:</Label>	
 			</Field>
 			<Field id="pollInterval" type="menu" defaultValue="20">
 				<Label>Poll Interval:</Label>
@@ -204,4 +221,153 @@
 		</States>
 	</Device>
 	
+	
+	<!-- this non-communicating device is used to identify a generic client which connects to Plex -->
+	<!-- and can be used to trigger events and actions -->
+	<Device type="custom" id="plexMediaClientSlot">
+		<Name>Plex Media Client Slot</Name>
+		<ConfigUI>
+			<Field id="identifyOptionsTitle" type="label" fontColor="darkGray">
+				<Label>CLIENT SLOT</Label>
+			</Field>
+			<Field id="instructionSeparator1" type="separator" />
+			<Field id="clientIdInstructions" type="label" fontSize="small">
+				<Label>Use this device to capture the data from connected clients regardless of their client id. This is useful to show, for example, all connections to your server. The slots are numbered with the first connected client in Slot 1, second in Slot 2, etc.</Label>
+			</Field>
+			<Field id="mediaServer" type="menu">
+				<Label>Plex Media Server:</Label>
+				<List class="indigo.devices" filter="self.plexMediaServer" />
+			</Field>
+			<Field id="plexClientId" type="menu">
+				<Label>Client Slot:</Label>
+				<List class="self" filter="" method="getConnectedClients" dynamicReload="true" />
+			</Field>
+			<Field id="loadConnectedClients" type="button">
+				<Label></Label>
+				<Title>Load Client Slot List</Title>
+				<CallbackMethod>reloadConnectedClientsList</CallbackMethod>
+			</Field>
+			<Field id="address" type="textfield" hidden='true'>
+				<Label/>
+			</Field>
+		</ConfigUI>
+		<UiDisplayStateId>clientConnectionStatus</UiDisplayStateId>
+		<States>
+			<State id="clientConnectionStatus">
+				<ValueType>
+					<List>
+						<Option value="connected">Connected</Option>
+						<Option value="disconnected">Not Connected</Option>
+						<Option value="paused">Paused</Option>
+						<Option value="playing">Playing</Option>
+					</List>
+				</ValueType>
+				<TriggerLabel>Connection Status Changed</TriggerLabel>
+				<TriggerLabelPrefix>Connection Status to</TriggerLabelPrefix>
+				<ControlPageLabel>Connection Status</ControlPageLabel>
+				<ControlPageLabelPrefix>Connection Status is</ControlPageLabelPrefix>
+			</State>
+			<State id="clientId">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Client ID</TriggerLabel>
+				<ControlPageLabel>Client ID</ControlPageLabel>
+			</State>
+			<State id="currentUser">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Current User</TriggerLabel>
+				<ControlPageLabel>Current User</ControlPageLabel>
+			</State>
+			<State id="currentlyPlayingTitle">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Currently Playing Title</TriggerLabel>
+				<ControlPageLabel>Currently Playing Title</ControlPageLabel>
+			</State>
+			<State id="currentlyPlayingArtUrl">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Currently Playing Art URL</TriggerLabel>
+				<ControlPageLabel>Currently Playing Art URL</ControlPageLabel>
+			</State>
+			<State id="currentlyPlayingThumbnailUrl">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Currently Playing Thumbnail URL</TriggerLabel>
+				<ControlPageLabel>Currently Playing Thumbnail URL</ControlPageLabel>
+			</State>
+			<State id="currentlyPlayingParentThumbnailUrl">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Currently Playing Parent Thumbnail URL</TriggerLabel>
+				<ControlPageLabel>Currently Playing Parent Thumbnail URL</ControlPageLabel>
+			</State>
+			<State id="currentlyPlayingGrandparentArtUrl">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Currently Playing Grandparent Art URL</TriggerLabel>
+				<ControlPageLabel>Currently Playing Grandparent Art URL</ControlPageLabel>
+			</State>
+			<State id="currentlyPlayingGrandparentThumbnailUrl">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Currently Playing Grandparent Thumbnail URL</TriggerLabel>
+				<ControlPageLabel>Currently Playing Grandparent Thumbnail URL</ControlPageLabel>
+			</State>
+			<State id="currentlyPlayingMediaType">
+				<ValueType>
+					<List>
+						<Option value="album">Album</Option>
+						<Option value="artist">Artist</Option>
+						<Option value="clip">Clip</Option>
+						<Option value="comic">Comic</Option>
+						<Option value="movie">Movie</Option>
+						<Option value="person">Person</Option>
+						<Option value="photo">Photo</Option>
+						<Option value="photoAlbum">Photo Album</Option>
+						<Option value="picture">Picture</Option>
+						<Option value="playlistItem">Playlist Clip</Option>
+						<Option value="show">Show</Option>
+						<Option value="track">Track</Option>
+						<Option value="trailer">Trailer</Option>
+						<Option value="episode">TV Episode</Option>
+						<Option value="season">TV Season</Option>
+						<Option value="unknown">Unknown</Option>
+					</List>
+				</ValueType>
+				<TriggerLabel>Currently Playing Media Type Changed</TriggerLabel>
+				<TriggerLabelPrefix>Currently Playing Media Type to</TriggerLabelPrefix>
+				<ControlPageLabel>Currently Playing Media Type</ControlPageLabel>
+				<ControlPageLabelPrefix>Currently Playing Media Type is</ControlPageLabelPrefix>
+			</State>
+			<State id="currentlPlayingTitleYear">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Content Year</TriggerLabel>
+				<ControlPageLabel>Content Year</ControlPageLabel>
+			</State>
+			<State id="currentlyPlayingStarRating">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Content Star Rating</TriggerLabel>
+				<ControlPageLabel>Content Star Rating</ControlPageLabel>
+			</State>
+			<State id="currentlyPlayingContentRating">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Content Rating</TriggerLabel>
+				<ControlPageLabel>Content Rating</ControlPageLabel>
+			</State>
+			<State id="currentlyPlayingContentResolution">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Content Resolution</TriggerLabel>
+				<ControlPageLabel>Content Resolution</ControlPageLabel>
+			</State>
+			<State id="currentlyPlayingContentLengthMS">
+				<ValueType>Integer</ValueType>
+				<TriggerLabel>Content Length (ms)</TriggerLabel>
+				<ControlPageLabel>Content Length (ms)</ControlPageLabel>
+			</State>
+			<State id="currentlyPlayingContentLengthOffset">
+				<ValueType>Number</ValueType>
+				<TriggerLabel>Content Current Offset (ms)</TriggerLabel>
+				<ControlPageLabel>Content Current Offset (ms)</ControlPageLabel>
+			</State>
+			<State id="currentlyPlayingContentPercentComplete">
+				<ValueType>Number</ValueType>
+				<TriggerLabel>Content Percent Complete</TriggerLabel>
+				<ControlPageLabel>Content Percent Complete</ControlPageLabel>
+			</State>
+		</States>
+	</Device>
 </Devices>

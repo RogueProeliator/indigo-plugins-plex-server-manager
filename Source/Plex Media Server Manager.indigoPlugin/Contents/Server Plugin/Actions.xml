@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <Actions>
-	<Action id="downloadCurrentlyPlayingArt" deviceFilter="self.plexMediaClient">
+	<Action id="downloadCurrentlyPlayingArt" deviceFilter="self.plexMediaClientSlot,self.plexMediaClient">
 		<Name>Download Currently Playing Art</Name>
 		<CallbackMethod>downloadCurrentlyPlayingArt</CallbackMethod>
 		<ConfigUI>
@@ -23,6 +23,26 @@
 			</Field>
 			<Field id="saveToFilename" type="textfield">
 				<Label>Save to Filename:</Label>
+			</Field>
+			<Field id="resizeMode" type="menu" defaultValue="none">
+				<Label>Resize Image:</Label>
+				<List>
+					<Option value="none">None - Full Size</Option>
+					<Option value="exact">Specific Size</Option>
+					<Option value="max">Maximum Dimension</Option>
+				</List>
+			</Field>
+			<Field id="imageResizeWidth" type="textfield" visibleBindingId="resizeMode" visibleBindingValue="exact">
+				<Label>width:</Label>
+			</Field>
+			<Field id="imageResizeHeight" type="textfield" visibleBindingId="resizeMode" visibleBindingValue="exact">
+				<Label>height:</Label>
+			</Field>
+			<Field id="imageResizeMaxDimension" type="textfield" visibleBindingId="resizeMode" visibleBindingValue="max">
+				<Label>max width/height:</Label>
+			</Field>
+			<Field id="imageResizeMaxDimensionInstructions" type="label" fontSize="small" alignWithControl="true">
+				<Label>The image will be resized (preserving the aspect ratio) such that neither the height nor width exceeds the specified dimension</Label>
 			</Field>
 			<Field id="noArtworkFilename" type="textfield">
 				<Label>No Current Media Filename:</Label>

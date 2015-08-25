@@ -52,11 +52,11 @@ class PlexMediaContainer(object):
 		
 		# based upon what information we have, we should be able to determine what type of information
 		# is being stored in the dictionary...
-		if plexContainerPath == "/":
+		if plexContainerPath == u'/':
 			self.containerType = MEDIACONTAINERTYPE_SERVERNODE
-		elif plexContainerPath == "/clients":
+		elif plexContainerPath == u'/clients':
 			self.containerType = MEDIACONTAINERTYPE_CLIENTLIST
-		elif plexContainerPath == "/status/sessions":
+		elif plexContainerPath == u'/status/sessions':
 			self.containerType = MEDIACONTAINERTYPE_SESSIONLIST
 		else:
 			self.containerType = MEDIACONTAINERTYPE_UNKNOWN
@@ -71,19 +71,19 @@ class PlexMediaContainer(object):
 		
 		# retrieve the list of directories that may be content of the media container
 		# node
-		for directoryNode in mediaContainerNode.findall("Directory"):
+		for directoryNode in mediaContainerNode.findall(u'Directory'):
 			self.directories.append(PlexMediaContainerDirectory(directoryNode))
 			
 		# retrieve the list of clients that may be content of the media container
 		# node (these are connected clients, not necessarily streaming now)
 		if self.containerType == MEDIACONTAINERTYPE_CLIENTLIST:
-			for clientNode in mediaContainerNode.findall("Server"):
+			for clientNode in mediaContainerNode.findall(u'Server'):
 				self.clients.append(PlexMediaClient(clientNode))
 			
 		# the session status requires special handling - it will have a Video node along with
 		# embedded player and media information nodes
 		if self.containerType == MEDIACONTAINERTYPE_SESSIONLIST:
-			for video in mediaContainerNode.findall("Video"):
+			for video in mediaContainerNode.findall(u'Video'):
 				self.videoSessions.append(PlexMediaContainerVideoSession(video))
 		
 		
@@ -144,10 +144,10 @@ class PlexMediaClient(object):
 	# Public Utilities
 	#/////////////////////////////////////////////////////////////////////////////////////
 	def getClientId(self):
-		return self.clientAttributes["machineIdentifier"] if "machineIdentifier" in self.clientAttributes else ""
+		return RPFramework.RPFrameworkUtils.to_unicode(self.clientAttributes["machineIdentifier"] if "machineIdentifier" in self.clientAttributes else "")
 	
 	def getClientName(self):
-		return self.clientAttributes["product"] if "product" in self.clientAttributes else ""
+		return RPFramework.RPFrameworkUtils.to_unicode(self.clientAttributes["product"] if "product" in self.clientAttributes else "")
 
 
 

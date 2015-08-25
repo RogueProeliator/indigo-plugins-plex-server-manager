@@ -6,13 +6,28 @@
 		<deviceMapping>
 			<device indigoId="plexMediaServer" className="PlexMediaServer" />
 			<device indigoId="plexMediaClient" className="PlexMediaClient" />
+			<device indigoId="plexMediaClientSlot" className="PlexMediaClient" />
 		</deviceMapping>
 		<devices>
 			<device indigoId="plexMediaServer">
 				<params>
+					<param indigoId="requestMethod" paramType="ParamTypeString" isRequired="True">
+						<invalidValueMessage><![CDATA[Please select the type of request to use]]></invalidValueMessage>
+					</param>
 					<param indigoId="httpAddress" paramType="ParamTypeString" isRequired="True">
 						<validationExpression><![CDATA[^[a-z\d\. ]+$]]></validationExpression>
 						<invalidValueMessage><![CDATA[Please enter the IP address or hostname of the media server to control]]></invalidValueMessage>
+					</param>
+					<param indigoId="loginRequired" paramType="ParamTypeBoolean" isRequired="False">
+						<invalidValueMessage><![CDATA[Please select whether or not the server requires a login]]></invalidValueMessage>
+					</param>
+					<param indigoId="plexUsername" paramType="ParamTypeString" isRequired="False">
+						<validationExpression></validationExpression>
+						<invalidValueMessage><![CDATA[Please enter a username to login to the server]]></invalidValueMessage>
+					</param>
+					<param indigoId="plexPassword" paramType="ParamTypeString" isRequired="False">
+						<validationExpression></validationExpression>
+						<invalidValueMessage><![CDATA[Please enter the password to login to the server]]></invalidValueMessage>
 					</param>
 					<param indigoId="httpPort" paramType="ParamTypeInteger" isRequired="True">
 						<minValue>1</minValue>
@@ -61,17 +76,32 @@
 					<deviceParentIdProperty>mediaServer</deviceParentIdProperty>
 				</guiConfiguration>
 			</device>
+			<device indigoId="plexMediaClientSlot">
+				<params>
+					<param indigoId="mediaServer" paramType="ParamTypeString" isRequired="True">
+						<invalidValueMessage><![CDATA[Please select the media server to which this client should be associated]]></invalidValueMessage>
+					</param>
+					<param indigoId="plexClientId" paramType="ParamTypeString" isRequired="True">
+						<invalidValueMessage><![CDATA[Please select the slot corresponding to this device]]></invalidValueMessage>
+					</param>
+				</params>
+				<guiConfiguration>
+					<deviceAddressFormat><![CDATA[%ap:plexClientId%]]></deviceAddressFormat>
+					<deviceIsChildDevice>True</deviceIsChildDevice>
+					<deviceParentIdProperty>mediaServer</deviceParentIdProperty>
+				</guiConfiguration>
+			</device>
 		</devices>
 		<actions>
 			<action indigoId="updateServerStatusFull">
 				<commands>
 					<command>
 						<commandName>RESTFUL_GET</commandName>
-						<commandFormat>/</commandFormat>
+						<commandFormat>%dp:requestMethod%|*|/|*|basic|*|%dp:plexUsername%|*|%dp:plexPassword%</commandFormat>
 					</command>
 					<command>
 						<commandName>RESTFUL_GET</commandName>
-						<commandFormat>/status/sessions</commandFormat>
+						<commandFormat>%dp:requestMethod%|*|/status/sessions|*|basic|*|%dp:plexUsername%|*|%dp:plexPassword%</commandFormat>
 					</command>
 				</commands>
 			</action>
@@ -83,8 +113,27 @@
 					<param indigoId="saveToFilename" paramType="ParamTypeString" isRequired="True">
 						<invalidValueMessage><![CDATA[Please enter a valid filename to which the art should be downloaded]]></invalidValueMessage>
 					</param>
+					<param indigoId="resizeMode" paramType="ParamTypeString" isRequired="True">
+						<invalidValueMessage><![CDATA[Please select a resize method]]></invalidValueMessage>
+						<defaultValue>none</defaultValue>
+					</param>
+					<param indigoId="imageResizeWidth" paramType="ParamTypeInteger" isRequired="False">
+						<invalidValueMessage><![CDATA[Please enter a valid dimenion (50 - 5000)]]></invalidValueMessage>
+						<minValue>50</minValue>
+						<maxValue>5000</maxValue>
+					</param>
+					<param indigoId="imageResizeHeight" paramType="ParamTypeInteger" isRequired="False">
+						<invalidValueMessage><![CDATA[Please enter a valid dimenion (50 - 5000)]]></invalidValueMessage>
+						<minValue>50</minValue>
+						<maxValue>5000</maxValue>
+					</param>
+					<param indigoId="imageResizeMaxDimension" paramType="ParamTypeInteger" isRequired="False">
+						<invalidValueMessage><![CDATA[Please enter a valid dimenion (50 - 5000)]]></invalidValueMessage>
+						<minValue>50</minValue>
+						<maxValue>5000</maxValue>
+					</param>
 					<param indigoId="noArtworkFilename" paramType="ParamTypeOSFilePath" isRequired="False">
-						<invalidValueMessage><![CDATA[Please enter a valid filename to which the art should be downloaded]]></invalidValueMessage>
+						<invalidValueMessage><![CDATA[Please enter a valid filename for use if no artwork is found (optional)]]></invalidValueMessage>
 					</param>
 				</params>
 			</action>
