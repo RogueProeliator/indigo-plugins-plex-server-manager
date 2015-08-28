@@ -117,8 +117,8 @@ class Plugin(RPFramework.RPFrameworkPlugin.RPFrameworkPlugin):
 		paramValues = pluginAction.props
 		validationResults = rpAction.validateActionValues(paramValues)
 		if validationResults[0] == False:
-			indigo.server.log(u'Invalid values sent for action "Download Currently Playing Art"; the following errors were found:')
-			indigo.server.log(RPFramework.RPFrameworkUtils.to_unicode(validationResults[2]))
+			indigo.server.log(u'Invalid values sent for action "Download Currently Playing Art"; the following errors were found:', isError=True)
+			indigo.server.log(RPFramework.RPFrameworkUtils.to_unicode(validationResults[2]), isError=True)
 			return
 			
 		# the first thing that is required is that we have art to download... this can come from the
@@ -148,7 +148,7 @@ class Plugin(RPFramework.RPFrameworkPlugin.RPFrameworkPlugin):
 				try:
 					shutil.copy2(RPFramework.RPFrameworkUtils.to_str(placeholderImageFN), RPFramework.RPFrameworkUtils.to_str(destinationFN))
 				except:
-					self.exceptionLog();
+					self.logErrorMessage(u'Error copying No Artwork file to destination');
 		else:
 			# we found art to download... we just need to queue this download as a normal file download
 			# command for the client
