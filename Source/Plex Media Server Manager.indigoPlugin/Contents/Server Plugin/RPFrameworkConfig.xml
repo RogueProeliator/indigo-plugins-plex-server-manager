@@ -96,6 +96,11 @@
 			<action indigoId="updateServerStatusFull">
 				<commands>
 					<command>
+						<commandName>obtainPlexSecurityToken</commandName>
+						<commandFormat></commandFormat>
+						<commandExecCondition><![CDATA[unicode('%dp:loginRequired%').lower() == u'true']]></commandExecCondition>
+					</command>
+					<command>
 						<commandName>RESTFUL_GET</commandName>
 						<commandFormat>%dp:requestMethod%|*|/|*|basic|*|%dp:plexUsername%|*|%dp:plexPassword%</commandFormat>
 					</command>

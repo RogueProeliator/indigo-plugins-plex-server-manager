@@ -14,6 +14,8 @@ import httplib
 import re
 import time
 import urllib2
+import xml.etree.ElementTree
+
 import indigo
 import RPFramework
 import plexMediaContainer 
@@ -52,6 +54,10 @@ class PlexMediaServer(RPFramework.RPFrameworkRESTfulDevice.RPFrameworkRESTfulDev
 		# we do not need to be quite as interactive as some plugins... so increase the wait
 		# time when the queue is empty
 		self.emptyQueueProcessingThreadSleepTime = 0.20
+		
+		# these variables store the data sent/obtained from the plex.tv servers whenever
+		# the user desires to require authentication on the server
+		self.plexSecurityToken = u''
 		
 		# add in updated/new states and properties
 		self.upgradedDeviceProperties.append((u'requestMethod', u'http')) 
@@ -215,6 +221,54 @@ class PlexMediaServer(RPFramework.RPFrameworkRESTfulDevice.RPFrameworkRESTfulDev
 			self.currentClientList = newClientList
 			self.indigoDevice.updateStateOnServer(key=u'connectedClientCount', value=len(newClientList))
 			
+	#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+	# This routine should be overridden in individual device classes whenever they must
+	# handle custom commands that are not already defined
+	#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+	def handleUnmanagedCommandInQueue(self, deviceHTTPAddress, rpCommand):
+		if rpCommand.commandName == u'obtainPlexSecurityToken':
+			# we need to obtain a security token from the plex website in order to_unicode
+			# access the plex server; if we already have a security token this may be skipped
+			if self.plexSecurityToken == u'':
+				plexHeaders = {u'X-Plex-Platform':u'Indigo', u'X-Plex-Platform-Version':indigo.server.apiVersion, u'X-Plex-Provides':u'controller', u'X-Plex-Client-Identifier':indigo.server.getDbName(), u'X-Plex-Product':u'Plex Media Server Manager', u'X-Plex-Version':self.hostPlugin.pluginVersion, u'X-Plex-Device':u'Indigo HA Server', u'X-Plex-Device-Name':u'Indigo Plugin'}
+				
+				responseObj = RPFramework.requests.post(u'https://plex.tv/users/sign_in.xml', headers=plexHeaders, auth=(self.indigoDevice.pluginProps.get(u'plexUsername', u''), self.indigoDevice.pluginProps.get(u'plexPassword', u'')))
+				self.hostPlugin.logDebugMessage(u'Plex.tv Sign-In Response: [' + RPFramework.RPFrameworkUtils.to_unicode(responseObj.status_code) + u'] ' + RPFramework.RPFrameworkUtils.to_unicode(responseObj.text), RPFramework.RPFrameworkPlugin.DEBUGLEVEL_HIGH)
+				self.hostPlugin.logDebugMessage(u'Plex.tv Sign-In Response Headers: ' + RPFramework.RPFrameworkUtils.to_unicode(responseObj.headers), RPFramework.RPFrameworkPlugin.DEBUGLEVEL_HIGH)
+				
+				# if successful, this should be a 201 response (Created)
+				if responseObj.status_code == 201:
+					# the response will be an XML return...
+					authenticationXml = xml.etree.ElementTree.fromstring(responseObj.text)
+					authTokenNode = authenticationXml.find(u'authentication-token')
+					self.plexSecurityToken = authTokenNode.text
+					self.hostPlugin.logDebugMessage(u'Successfully obtained plex.tv authentication token', RPFramework.RPFrameworkPlugin.DEBUGLEVEL_LOW)
+				else:
+					self.plexSecurityToken = u''
+					indigo.server.log(u'Failed to obtain authentication token from plex.tv site.', isError=True)
+					
+	#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+	# This routine will be called prior to any network operation to allow the addition
+	# of custom headers to the request (does not include file download)
+	#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+	def addCustomHTTPHeaders(self, httpRequestHeaders):
+		if self.plexSecurityToken != u'':
+			httpRequestHeaders[u'X-Plex-Token'] = self.plexSecurityToken
+			self.hostPlugin.logDebugMessage(u'Added authentication token to request', RPFramework.RPFrameworkPlugin.DEBUGLEVEL_HIGH)
+			
+	#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+	# This routine will handle an error as thrown by the REST call... it allows 
+	# descendant classes to do their own processing
+	#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-		
+	def handleRESTfulError(self, rpCommand, err, response=None):
+		if rpCommand != None and rpCommand.commandName == u'updateServerStatusFull' and not response is None:
+			# this could be an authorization issue...
+			if response.status_code == 401 and self.plexSecurityToken != u'':
+				self.plexSecurityToken = u''
+				self.hostPlugin.logDebugMessage(u'Invalidating security token due to unauthorized response from status request', RPFramework.RPFrameworkPlugin.DEBUGLEVEL_LOW)
+				return
+		super(PlexMediaServer, self).handleRESTfulError(rpCommand, err, response)
+					
 	
 	#/////////////////////////////////////////////////////////////////////////////////////
 	# Utility Routines
