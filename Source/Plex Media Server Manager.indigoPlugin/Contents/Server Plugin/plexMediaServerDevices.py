@@ -148,6 +148,7 @@ class PlexMediaServer(RPFramework.RPFrameworkRESTfulDevice.RPFrameworkRESTfulDev
 							grandparentTitle = grandparentTitle + u' : '
 						mediaTitle = grandparentTitle + mediaTitle
 					clientDevice.indigoDevice.updateStateOnServer(key=u'currentlyPlayingTitle', value=mediaTitle)
+					clientDevice.indigoDevice.updateStateOnServer(key=u'currentlyPlayingSummary', value=session.videoAttributes.get(u'summary', u''))
 					
 					clientDevice.indigoDevice.updateStateOnServer(key=u'currentlyPlayingArtUrl', value=session.videoAttributes.get(u'art', u''))
 					clientDevice.indigoDevice.updateStateOnServer(key=u'currentlyPlayingThumbnailUrl', value=session.videoAttributes.get(u'thumb', u''))
@@ -169,6 +170,8 @@ class PlexMediaServer(RPFramework.RPFrameworkRESTfulDevice.RPFrameworkRESTfulDev
 						percentComplete = int(((1.0 * currentOffset) / (1.0 * contentDuration)) * 100.0)
 					clientDevice.indigoDevice.updateStateOnServer(key=u'currentlyPlayingContentPercentComplete', value=percentComplete)
 					
+					clientDevice.indigoDevice.updateStateOnServer(key=u'playerDeviceTitle', value=session.playerInfo.get(u'title', u''))
+					
 				else:
 					self.hostPlugin.logDebugMessage(u'Found unknown client: ' + playerMachineId, RPFramework.RPFrameworkPlugin.DEBUGLEVEL_MED)
 				
@@ -186,8 +189,12 @@ class PlexMediaServer(RPFramework.RPFrameworkRESTfulDevice.RPFrameworkRESTfulDev
 						childDevice.indigoDevice.updateStateOnServer(key=u'currentUser', value=u'')
 						childDevice.indigoDevice.updateStateOnServer(key=u'currentlyPlayingMediaType', value=u'unknown')
 						childDevice.indigoDevice.updateStateOnServer(key=u'currentlyPlayingTitle', value=u'')
+						childDevice.indigoDevice.updateStateOnServer(key=u'currentlyPlayingSummary', value=u'')
 						childDevice.indigoDevice.updateStateOnServer(key=u'currentlyPlayingArtUrl', value=u'')
 						childDevice.indigoDevice.updateStateOnServer(key=u'currentlyPlayingThumbnailUrl', value=u'')
+						childDevice.indigoDevice.updateStateOnServer(key=u'currentlyPlayingParentThumbnailUrl', value=u'')
+						childDevice.indigoDevice.updateStateOnServer(key=u'currentlyPlayingGrandparentArtUrl', value=u'')
+						childDevice.indigoDevice.updateStateOnServer(key=u'currentlyPlayingGrandparentThumbnailUrl', value=u'')
 						childDevice.indigoDevice.updateStateOnServer(key=u'currentlPlayingTitleYear', value=u'')
 						childDevice.indigoDevice.updateStateOnServer(key=u'currentlyPlayingStarRating', value=u'')
 						childDevice.indigoDevice.updateStateOnServer(key=u'currentlyPlayingContentRating', value=u'')
@@ -195,6 +202,7 @@ class PlexMediaServer(RPFramework.RPFrameworkRESTfulDevice.RPFrameworkRESTfulDev
 						childDevice.indigoDevice.updateStateOnServer(key=u'currentlyPlayingContentLengthMS', value=0)
 						childDevice.indigoDevice.updateStateOnServer(key=u'currentlyPlayingContentLengthOffset', value=0)
 						childDevice.indigoDevice.updateStateOnServer(key=u'currentlyPlayingContentPercentComplete', value=0)
+						childDevice.indigoDevice.updateStateOnServer(key=u'playerDeviceTitle', value=u'')
 				elif childDevice.indigoDevice.deviceTypeId == u'plexMediaClientSlot':
 					clientSlotNumStr = childDevice.indigoDevice.pluginProps.get('plexClientId', 'Slot 99')
 					if clientSlotNumStr == u'':
@@ -206,8 +214,12 @@ class PlexMediaServer(RPFramework.RPFrameworkRESTfulDevice.RPFrameworkRESTfulDev
 						childDevice.indigoDevice.updateStateOnServer(key=u'currentUser', value=u'')
 						childDevice.indigoDevice.updateStateOnServer(key=u'currentlyPlayingMediaType', value=u'unknown')
 						childDevice.indigoDevice.updateStateOnServer(key=u'currentlyPlayingTitle', value=u'')
+						childDevice.indigoDevice.updateStateOnServer(key=u'currentlyPlayingSummary', value=u'')
 						childDevice.indigoDevice.updateStateOnServer(key=u'currentlyPlayingArtUrl', value=u'')
 						childDevice.indigoDevice.updateStateOnServer(key=u'currentlyPlayingThumbnailUrl', value=u'')
+						childDevice.indigoDevice.updateStateOnServer(key=u'currentlyPlayingParentThumbnailUrl', value=u'')
+						childDevice.indigoDevice.updateStateOnServer(key=u'currentlyPlayingGrandparentArtUrl', value=u'')
+						childDevice.indigoDevice.updateStateOnServer(key=u'currentlyPlayingGrandparentThumbnailUrl', value=u'')
 						childDevice.indigoDevice.updateStateOnServer(key=u'currentlPlayingTitleYear', value=u'')
 						childDevice.indigoDevice.updateStateOnServer(key=u'currentlyPlayingStarRating', value=u'')
 						childDevice.indigoDevice.updateStateOnServer(key=u'currentlyPlayingContentRating', value=u'')
@@ -215,6 +227,7 @@ class PlexMediaServer(RPFramework.RPFrameworkRESTfulDevice.RPFrameworkRESTfulDev
 						childDevice.indigoDevice.updateStateOnServer(key=u'currentlyPlayingContentLengthMS', value=0)
 						childDevice.indigoDevice.updateStateOnServer(key=u'currentlyPlayingContentLengthOffset', value=0)
 						childDevice.indigoDevice.updateStateOnServer(key=u'currentlyPlayingContentPercentComplete', value=0)
+						childDevice.indigoDevice.updateStateOnServer(key=u'playerDeviceTitle', value=u'')
 			
 			# update our list of currently connected clients
 			self.hostPlugin.logDebugMessage(u'Updating current client list to: ' + RPFramework.RPFrameworkUtils.to_unicode(newClientList), RPFramework.RPFrameworkPlugin.DEBUGLEVEL_MED)
@@ -239,7 +252,7 @@ class PlexMediaServer(RPFramework.RPFrameworkRESTfulDevice.RPFrameworkRESTfulDev
 				# if successful, this should be a 201 response (Created)
 				if responseObj.status_code == 201:
 					# the response will be an XML return...
-					authenticationXml = xml.etree.ElementTree.fromstring(responseObj.text)
+					authenticationXml = xml.etree.ElementTree.fromstring(RPFramework.RPFrameworkUtils.to_str(responseObj.text))
 					authTokenNode = authenticationXml.find(u'authentication-token')
 					self.plexSecurityToken = authTokenNode.text
 					self.hostPlugin.logDebugMessage(u'Successfully obtained plex.tv authentication token', RPFramework.RPFrameworkPlugin.DEBUGLEVEL_LOW)
@@ -329,4 +342,6 @@ class PlexMediaClient(RPFramework.RPFrameworkNonCommChildDevice.RPFrameworkNonCo
 		
 		self.upgradedDeviceStates.append(u'currentlyPlayingParentThumbnailUrl')
 		self.upgradedDeviceStates.append(u'currentlyPlayingGrandparentArtUrl')
+		self.upgradedDeviceStates.append(u'currentlyPlayingSummary')
+		self.upgradedDeviceStates.append(u'playerDeviceTitle')
 		

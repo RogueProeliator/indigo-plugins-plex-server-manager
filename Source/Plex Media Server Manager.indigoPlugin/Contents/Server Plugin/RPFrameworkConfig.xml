@@ -142,6 +142,38 @@
 					</param>
 				</params>
 			</action>
+			<action indigoId="downloadCurrentlyPlayingSlotArt">
+				<params>
+					<param indigoId="artElement" paramType="ParamTypeString" isRequired="True">
+						<invalidValueMessage><![CDATA[Please select the art element to download]]></invalidValueMessage>
+					</param>
+					<param indigoId="saveToFilename" paramType="ParamTypeString" isRequired="True">
+						<invalidValueMessage><![CDATA[Please enter a valid filename to which the art should be downloaded]]></invalidValueMessage>
+					</param>
+					<param indigoId="resizeMode" paramType="ParamTypeString" isRequired="True">
+						<invalidValueMessage><![CDATA[Please select a resize method]]></invalidValueMessage>
+						<defaultValue>none</defaultValue>
+					</param>
+					<param indigoId="imageResizeWidth" paramType="ParamTypeInteger" isRequired="False">
+						<invalidValueMessage><![CDATA[Please enter a valid dimenion (50 - 5000)]]></invalidValueMessage>
+						<minValue>50</minValue>
+						<maxValue>5000</maxValue>
+					</param>
+					<param indigoId="imageResizeHeight" paramType="ParamTypeInteger" isRequired="False">
+						<invalidValueMessage><![CDATA[Please enter a valid dimenion (50 - 5000)]]></invalidValueMessage>
+						<minValue>50</minValue>
+						<maxValue>5000</maxValue>
+					</param>
+					<param indigoId="imageResizeMaxDimension" paramType="ParamTypeInteger" isRequired="False">
+						<invalidValueMessage><![CDATA[Please enter a valid dimenion (50 - 5000)]]></invalidValueMessage>
+						<minValue>50</minValue>
+						<maxValue>5000</maxValue>
+					</param>
+					<param indigoId="noArtworkFilename" paramType="ParamTypeOSFilePath" isRequired="False">
+						<invalidValueMessage><![CDATA[Please enter a valid filename for use if no artwork is found (optional)]]></invalidValueMessage>
+					</param>
+				</params>
+			</action>
 		</actions>
 	</pluginConfig>
 </RPFrameworkConfig>

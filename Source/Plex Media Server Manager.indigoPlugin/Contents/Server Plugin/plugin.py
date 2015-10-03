@@ -13,6 +13,11 @@
 #	Version 0.8.17:
 #		Added unicode support
 #		Added support for secure (SSL) connection to server
+#	Version 1.0.17:
+#		Fixed bug where grandparent art URL was not cleared when client slots disconnected
+#		Added Currently Playing Summary state - description of the show
+#		Added Device Title state
+#		Added art download action for Slot devices
 #
 #/////////////////////////////////////////////////////////////////////////////////////////
 #/////////////////////////////////////////////////////////////////////////////////////////
@@ -117,7 +122,7 @@ class Plugin(RPFramework.RPFrameworkPlugin.RPFrameworkPlugin):
 		paramValues = pluginAction.props
 		validationResults = rpAction.validateActionValues(paramValues)
 		if validationResults[0] == False:
-			indigo.server.log(u'Invalid values sent for action "Download Currently Playing Art"; the following errors were found:', isError=True)
+			indigo.server.log(u'Invalid values sent for action "Download Currently Playing Art for Slot"; the following errors were found:', isError=True)
 			indigo.server.log(RPFramework.RPFrameworkUtils.to_unicode(validationResults[2]), isError=True)
 			return
 			

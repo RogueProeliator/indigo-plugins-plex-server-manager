@@ -62,7 +62,7 @@ class PlexMediaContainer(object):
 			self.containerType = MEDIACONTAINERTYPE_UNKNOWN
 	
 		# parse the XML provided...
-		mediaContainerNode = xml.etree.ElementTree.fromstring(mediaContainerXml)
+		mediaContainerNode = xml.etree.ElementTree.fromstring(RPFramework.RPFrameworkUtils.to_str(mediaContainerXml))
 		
 		# the root container node will have a bunch of attributes which should be loaded into
 		# our attributes container

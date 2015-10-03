@@ -132,6 +132,11 @@
 				<TriggerLabel>Currently Playing Title</TriggerLabel>
 				<ControlPageLabel>Currently Playing Title</ControlPageLabel>
 			</State>
+			<State id="currentlyPlayingSummary">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Currently Playing Summary</TriggerLabel>
+				<ControlPageLabel>Currently Playing Summary</ControlPageLabel>
+			</State>
 			<State id="currentlyPlayingArtUrl">
 				<ValueType>String</ValueType>
 				<TriggerLabel>Currently Playing Art URL</TriggerLabel>
@@ -217,6 +222,11 @@
 				<ValueType>Number</ValueType>
 				<TriggerLabel>Content Percent Complete</TriggerLabel>
 				<ControlPageLabel>Content Percent Complete</ControlPageLabel>
+			</State>
+			<State id="playerDeviceTitle">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Device Title</TriggerLabel>
+				<ControlPageLabel>Device Title</ControlPageLabel>
 			</State>
 		</States>
 	</Device>
@@ -282,6 +292,11 @@
 				<TriggerLabel>Currently Playing Title</TriggerLabel>
 				<ControlPageLabel>Currently Playing Title</ControlPageLabel>
 			</State>
+			<State id="currentlyPlayingSummary">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Currently Playing Summary</TriggerLabel>
+				<ControlPageLabel>Currently Playing Summary</ControlPageLabel>
+			</State>
 			<State id="currentlyPlayingArtUrl">
 				<ValueType>String</ValueType>
 				<TriggerLabel>Currently Playing Art URL</TriggerLabel>
@@ -367,6 +382,11 @@
 				<ValueType>Number</ValueType>
 				<TriggerLabel>Content Percent Complete</TriggerLabel>
 				<ControlPageLabel>Content Percent Complete</ControlPageLabel>
+			</State>
+			<State id="playerDeviceTitle">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Device Title</TriggerLabel>
+				<ControlPageLabel>Device Title</ControlPageLabel>
 			</State>
 		</States>
 	</Device>
