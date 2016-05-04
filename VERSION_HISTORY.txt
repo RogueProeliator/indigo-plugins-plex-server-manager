@@ -1,0 +1,20 @@
+Plex Media Server Manager Indigo Plugin
+https://github.com/RogueProeliator/IndigoPlugins-Plex-Server-Manager-Plugin
+
+To update to the latest version of the application, please download the latest release available at https://github.com/RogueProeliator/IndigoPlugins-Plex-Server-Manager-Plugin/releases or via the Check For Updates menu option if you already have a version installed.
+
+=================================
+VERSION HISTORY
+=================================
+v0.8.17 [August 2015]:
+* Support for secure access via HTTPS (requires Plex Media Server v0.9.12.3)
+* Support for authentication! You no longer need to turn off authentication on the local network
+* A new device type for the "unnamed" clients
+* Unicode support throughout the plugin
+* Friendlier error messages and debug options
+
+v1.0.17 [October 2015]:
+* Fixed bug causing grandparent art url to not clear itself when a client disconnected after playing a TV show
+* Added "Currently Playing Summary" state for tracking the description/summary of the currently playing title
+* Added a "Device Title" state to show the name of the client which is connected
+* Added an art download action for "Slot" type devices
