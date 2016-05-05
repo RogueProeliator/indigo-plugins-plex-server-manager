@@ -226,8 +226,8 @@ class RPFrameworkPlugin(indigo.PluginBase):
 		
 		# reduce the logging level of the requests library so it doesn't flood the Indigo Log
 		# with unnecessary information
-		logging.getLogger("requests").setLevel(logging.WARNING)
-		logging.getLogger("urllib3").setLevel(logging.WARNING)
+		logging.getLogger("RPFramework.requests").setLevel(logging.WARNING)
+		logging.getLogger("RPFramework.requests.packages.urllib3").setLevel(logging.WARNING)
 	
 	
 	#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
