@@ -6,7 +6,7 @@ To update to the latest version of the application, please download the latest r
 =================================
 VERSION HISTORY
 =================================
-v1.1.0 [May 2016]:
+v1.1.1 [May 2016]:
 * Changes updater to use GitHub (thanks jheddings)
 * Logging level changes as per Indigo's recommendations to eliminate extraneous logging from 3rd party libraries
 
