@@ -2,11 +2,16 @@
 # -*- coding: utf-8 -*-
 #/////////////////////////////////////////////////////////////////////////////////////////
 #/////////////////////////////////////////////////////////////////////////////////////////
-# Plex Server Manager by RogueProeliator <rp@rogueproeliator.com>
+# Plex Server Manager by RogueProeliator <adam.d.ashe@gmail.com>
 # 	Indigo plugin designed to allow full control of Plex Media Servers and clients
 #	
 #	Command structure based on the PMS published API, available here:
 #		https://code.google.com/p/plex-api/wiki/MediaContainer
+#
+#	This plugin is released under an MIT license - this is a very simple and permissive
+#	license and may be found in the LICENSE.txt file found in the root of this plugin's
+#	GitHub repository:
+#		https://github.com/RogueProeliator/IndigoPlugins-Plex-Server-Manager-Plugin
 #
 #	Version 0.0.1:
 #		Initial Release
