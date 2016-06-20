@@ -38,7 +38,7 @@ The plugin tracks several devices states which are updated according to the poll
 - activeSessionsCount: the number of clients actively streaming content from the server
 
 ###Plex Media Client Device States
-- clientConnectionStatus: the current state of the client -- Connected, Not Connected, Paused or Playing
+- clientConnectionStatus: the current state of the client -- Connected, Not Connected, Paused, Buffering, or Playing
 - currentUser: the name of the current user logged in via the client
 - currentlyPlayingTitle: the title of the currently playing media (title of the movie or "Series : Episode Title" for TV shows)
 - currentlyPlayingSummary: the summary/description provided for the currently playing media
