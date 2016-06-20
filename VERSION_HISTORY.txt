@@ -6,6 +6,9 @@ To update to the latest version of the application, please download the latest r
 =================================
 VERSION HISTORY
 =================================
+v1.1.2 [June 2016]:
+* Added new "Buffering" state for client devices
+
 v1.1.1 [May 2016]:
 * Changes updater to use GitHub (thanks jheddings)
 * Logging level changes as per Indigo's recommendations to eliminate extraneous logging from 3rd party libraries
