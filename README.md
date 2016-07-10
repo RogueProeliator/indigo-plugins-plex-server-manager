@@ -23,8 +23,8 @@ You will need to create a single Plex Media Server device for each server instal
 ###Plex Media Client Devices
 Plex Media Client devices allow you to monitor particular clients which connect to the Plex Media Server which you setup in the previous step. This will allow you track their current state (e.g. connected, playing, paused, disconnected) as well as obtain information about the media that they are currently playing -- such as the title, rating, artwork, etc. You can also trigger off the current state in order to setup theater scenes or turn on lights whenever the client stops for that mid-movie popcorn break!
 
-When you create this device in Indigo it will show you a device configuration dialog, as seen below. Select the Plex Media Server and the client you wish to monitor from the list of currently-connected clients. In order for your client to appear here, it must be actively connected to the Plex Media Server. The best way to ensure it is seen is to begin playing a movie, music or TV show on the client (it may be paused).
-![](<Documentation/Doc-Images/PlexMediaServerManager_ClientDeviceConfig.png>)
+When you create this device in Indigo it will show you a device configuration dialog, as seen below. Select the Plex Media Server and the client you wish to monitor from the list of currently-connected clients. In order for your client to appear here, it must be actively connected to the Plex Media Server. The best way to ensure it is seen is to begin playing a movie, music or TV show on the client (it may be paused).<br />
+![](<Documentation/Doc-Images/PlexMediaServerManager_ClientDeviceConfig.png>)<br />
 Alternatively, if you do not care about what particular client is connected and just the connections, you may use the Plex Media Client Slot device. Instead of selecting a particular client, you tell it to monitor the first connection (Slot 1), the second connected client (Slot 2), etc. This is most often used to be able to show a control page with all of the connections to the server.
 
 #Available Device States
