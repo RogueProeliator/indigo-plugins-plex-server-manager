@@ -12,12 +12,12 @@ The first step is to ensure that your receiver is connected to the network; the 
 The latest released version of the plugin is available for download in the Releases section... those versions in beta will be marked as a Pre-Release and will not appear in update notifications.
 
 ###Configuring the Plugin
-Upon first installation you will be asked to configure the plugin; please see the instructions on the configuration screen for more information. Most users will be fine with the defaults unless an email is desired when a new version is released.
+Upon first installation you will be asked to configure the plugin; please see the instructions on the configuration screen for more information. Most users will be fine with the defaults unless an email is desired when a new version is released.<br />
 ![](<Documentation/Doc-Images/PlexMediaServerManager_PluginConfig.png>)
 
 #Plugin Devices
 ###Plex Media Server Devices
-You will need to create a single Plex Media Server device for each server installation that you wish to monitor. This Indigo device will track basic information such as the number of connected clients and active sessions. Upon creating the new Indigo device, you will be presented with the device configuration screen:
+You will need to create a single Plex Media Server device for each server installation that you wish to monitor. This Indigo device will track basic information such as the number of connected clients and active sessions. Upon creating the new Indigo device, you will be presented with the device configuration screen:<br />
 ![](<Documentation/Doc-Images/PlexMediaServerManager_ServerDeviceConfig.png>)
 
 ###Plex Media Client Devices
@@ -25,6 +25,7 @@ Plex Media Client devices allow you to monitor particular clients which connect 
 
 When you create this device in Indigo it will show you a device configuration dialog, as seen below. Select the Plex Media Server and the client you wish to monitor from the list of currently-connected clients. In order for your client to appear here, it must be actively connected to the Plex Media Server. The best way to ensure it is seen is to begin playing a movie, music or TV show on the client (it may be paused).<br />
 ![](<Documentation/Doc-Images/PlexMediaServerManager_ClientDeviceConfig.png>)<br />
+
 Alternatively, if you do not care about what particular client is connected and just the connections, you may use the Plex Media Client Slot device. Instead of selecting a particular client, you tell it to monitor the first connection (Slot 1), the second connected client (Slot 2), etc. This is most often used to be able to show a control page with all of the connections to the server.
 
 #Available Device States
@@ -56,6 +57,6 @@ The plugin tracks several devices states which are updated according to the poll
 
 #Notable Actions
 ###Download Currently Playing Art / Download Currently Playing Art for Slot
-This allows you to download the various artwork associated with the currently playing media file of a client and, optionally, define a "no artwork available" image to use when none is found (or the client is disconnected). Use with the standard configuration dialog for a description of the fields, or it may be executed via script:
+This allows you to download the various artwork associated with the currently playing media file of a client and, optionally, define a "no artwork available" image to use when none is found (or the client is disconnected). Use with the standard configuration dialog for a description of the fields, or it may be executed via script:<br />
 ![](<Documentation/Doc-Images/PlexMediaServerManager_DownloadArtConfig.png>)
 
