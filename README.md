@@ -32,28 +32,28 @@ Alternatively, if you do not care about what particular client is connected and 
 The plugin tracks several devices states which are updated according to the polling frequency set in Plex Media Server Device Config as seen above; both the server and client states are updated according to the update polling frequency.
 
 ###Plex Media Server Device States
-- connectionState: track if Indigo has been able to successfully create/maintain a connection to the server
-- serverVersion: reports the version of the server software installed and monitored by the plugin
-- transcoderActiveVideoSessions: tracks the number of active transcoding sessions being processed by the server
-- connectedClientCount: the number of clients connected to the server (not accurate at this time)
-- activeSessionsCount: the number of clients actively streaming content from the server
+- **connectionState**: track if Indigo has been able to successfully create/maintain a connection to the server
+- **serverVersion**: reports the version of the server software installed and monitored by the plugin
+- **transcoderActiveVideoSessions**: tracks the number of active transcoding sessions being processed by the server
+- **connectedClientCount**: the number of clients connected to the server (not accurate at this time)
+- **activeSessionsCount**: the number of clients actively streaming content from the server
 
 ###Plex Media Client Device States
-- clientConnectionStatus: the current state of the client -- Connected, Not Connected, Paused, Buffering, or Playing
-- currentUser: the name of the current user logged in via the client
-- currentlyPlayingTitle: the title of the currently playing media (title of the movie or "Series : Episode Title" for TV shows)
-- currentlyPlayingSummary: the summary/description provided for the currently playing media
-- currentlyPlayingArtUrl: the relative URL that may be used to display the currently playing media's artwork
-- currentlyPlayingThumbnailUrl: the relative URL that may be used to display the currently playing media's thumbnail artwork
-- currentlyPlayingMediaType: the type of media currently being played -- Clip, Movie, Playlist Clip, Trailer, TV Episode or Unknown
-- currentlPlayingTitleYear: the release year of the currently playing title
-- currentlyPlayingStarRating: the "star rating" of the currently playing media
-- currentlyPlayingContentRating: the "content rating" of the currently playing media -- such as G, PG, PG-13, etc.
-- currentlyPlayingContentResolution: the resolution of the currently playing media - such as 720 or 1080
-- currentlyPlayingContentLengthMS: the length, in milliseconds, of the currently playing media
-- currentlyPlayingContentLengthOffset: the current position of the client within the currently playing media
-- currentlyPlayingContentPercentComplete: the current position of the client as a percentage complete
-- playerDeviceTitle: the name of the device which is playing this media (e.g. Roku 2 XS)
+- **clientConnectionStatus**: the current state of the client -- Connected, Not Connected, Paused, Buffering, or Playing
+- **currentUser**: the name of the current user logged in via the client
+- **currentlyPlayingTitle**: the title of the currently playing media (title of the movie or "Series : Episode Title" for TV shows)
+- **currentlyPlayingSummary**: the summary/description provided for the currently playing media
+- **currentlyPlayingArtUrl**: the relative URL that may be used to display the currently playing media's artwork
+- **currentlyPlayingThumbnailUrl**: the relative URL that may be used to display the currently playing media's thumbnail artwork
+- **currentlyPlayingMediaType**: the type of media currently being played -- Clip, Movie, Playlist Clip, Trailer, TV Episode or Unknown
+- **currentlPlayingTitleYear**: the release year of the currently playing title
+- **currentlyPlayingStarRating**: the "star rating" of the currently playing media
+- **currentlyPlayingContentRating**: the "content rating" of the currently playing media -- such as G, PG, PG-13, etc.
+- **currentlyPlayingContentResolution**: the resolution of the currently playing media - such as 720 or 1080
+- **currentlyPlayingContentLengthMS**: the length, in milliseconds, of the currently playing media
+- **currentlyPlayingContentLengthOffset**: the current position of the client within the currently playing media
+- **currentlyPlayingContentPercentComplete**: the current position of the client as a percentage complete
+- **playerDeviceTitle**: the name of the device which is playing this media (e.g. Roku 2 XS)
 
 #Notable Actions
 ###Download Currently Playing Art / Download Currently Playing Art for Slot
