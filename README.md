@@ -60,3 +60,8 @@ The plugin tracks several devices states which are updated according to the poll
 This allows you to download the various artwork associated with the currently playing media file of a client and, optionally, define a "no artwork available" image to use when none is found (or the client is disconnected). Use with the standard configuration dialog for a description of the fields, or it may be executed via script:<br />
 ![](<Documentation/Doc-Images/PlexMediaServerManager_DownloadArtConfig.png>)
 
+*via scripting*
+```python
+plexMediaServerManager = indigo.server.getPlugin("com.duncanware.plexMediaServerManager")
+plexMediaServerManager.executeAction("downloadCurrentlyPlayingArt", <YOUR_DEVICE_ID>, props={"artElement":"art", "saveToFilename":"/Users/aashe/Pictures/CurrentlyPlayingArt.png", "noArtworkFilename":"/Users/aashe/Pictures/NoArtworkAvailablePlaceholder.png"})
+```
