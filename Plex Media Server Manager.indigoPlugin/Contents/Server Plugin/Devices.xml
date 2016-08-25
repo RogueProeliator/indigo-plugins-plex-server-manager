@@ -214,10 +214,20 @@
 				<TriggerLabel>Content Length (ms)</TriggerLabel>
 				<ControlPageLabel>Content Length (ms)</ControlPageLabel>
 			</State>
+			<State id="currentlyPlayingContentLengthDisplay">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Content Length</TriggerLabel>
+				<ControlPageLabel>Content Length</ControlPageLabel>
+			</State>
 			<State id="currentlyPlayingContentLengthOffset">
 				<ValueType>Number</ValueType>
 				<TriggerLabel>Content Current Offset (ms)</TriggerLabel>
 				<ControlPageLabel>Content Current Offset (ms)</ControlPageLabel>
+			</State>
+			<State id="currentlyPlayingContentLengthOffsetDisplay">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Content Current Position</TriggerLabel>
+				<ControlPageLabel>Content Current Position</ControlPageLabel>
 			</State>
 			<State id="currentlyPlayingContentPercentComplete">
 				<ValueType>Number</ValueType>
@@ -374,10 +384,20 @@
 				<TriggerLabel>Content Length (ms)</TriggerLabel>
 				<ControlPageLabel>Content Length (ms)</ControlPageLabel>
 			</State>
+			<State id="currentlyPlayingContentLengthDisplay">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Content Length</TriggerLabel>
+				<ControlPageLabel>Content Length</ControlPageLabel>
+			</State>
 			<State id="currentlyPlayingContentLengthOffset">
 				<ValueType>Number</ValueType>
 				<TriggerLabel>Content Current Offset (ms)</TriggerLabel>
 				<ControlPageLabel>Content Current Offset (ms)</ControlPageLabel>
+			</State>
+			<State id="currentlyPlayingContentLengthOffsetDisplay">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Content Current Position</TriggerLabel>
+				<ControlPageLabel>Content Current Position</ControlPageLabel>
 			</State>
 			<State id="currentlyPlayingContentPercentComplete">
 				<ValueType>Number</ValueType>

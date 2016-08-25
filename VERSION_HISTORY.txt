@@ -6,6 +6,12 @@ To update to the latest version of the application, please download the latest r
 =================================
 VERSION HISTORY
 =================================
+v1.2.0 [August 2016]:
+* Added two states for better display of Content Length and Current Position:
+	currentlyPlayingContentLengthDisplay
+	currentlyPlayingContentLengthOffsetDisplay
+* Bug fix causing an error calculating percentage complete at times
+
 v1.1.2 [June 2016]:
 * Added new "Buffering" state for client devices
 
