@@ -12,6 +12,7 @@
 #/////////////////////////////////////////////////////////////////////////////////////////
 import httplib
 import re
+import datetime
 import time
 import urllib2
 import xml.etree.ElementTree
@@ -163,9 +164,11 @@ class PlexMediaServer(RPFramework.RPFrameworkRESTfulDevice.RPFrameworkRESTfulDev
 					contentDuration = int(session.videoAttributes.get(u'duration', u'0'))
 					currentOffset = int(session.videoAttributes.get(u'viewOffset', u'0'))
 					clientDevice.indigoDevice.updateStateOnServer(key=u'currentlyPlayingContentLengthMS', value=contentDuration)
+					clientDevice.indigoDevice.updateStateOnServer(key=u'currentlyPlayingContentLengthDisplay', value=str(datetime.timedelta(seconds=contentDuration/1000)))
 					clientDevice.indigoDevice.updateStateOnServer(key=u'currentlyPlayingContentLengthOffset', value=currentOffset)
+					clientDevice.indigoDevice.updateStateOnServer(key=u'currentlyPlayingContentLengthOffsetDisplay', value=str(datetime.timedelta(seconds=currentOffset/1000)))
 					if currentOffset == 0:
-						percentComplete = 0.0
+						percentComplete = 0
 					else:
 						percentComplete = int(((1.0 * currentOffset) / (1.0 * contentDuration)) * 100.0)
 					clientDevice.indigoDevice.updateStateOnServer(key=u'currentlyPlayingContentPercentComplete', value=percentComplete, uiValue='{0:d}%'.format(percentComplete))
@@ -344,4 +347,6 @@ class PlexMediaClient(RPFramework.RPFrameworkNonCommChildDevice.RPFrameworkNonCo
 		self.upgradedDeviceStates.append(u'currentlyPlayingGrandparentArtUrl')
 		self.upgradedDeviceStates.append(u'currentlyPlayingSummary')
 		self.upgradedDeviceStates.append(u'playerDeviceTitle')
+		self.upgradedDeviceStates.append(u'currentlyPlayingContentLengthDisplay')
+		self.upgradedDeviceStates.append(u'currentlyPlayingContentLengthOffsetDisplay')
 		
