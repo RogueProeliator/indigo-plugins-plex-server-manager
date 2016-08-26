@@ -168,10 +168,10 @@ class PlexMediaServer(RPFramework.RPFrameworkRESTfulDevice.RPFrameworkRESTfulDev
 					clientDevice.indigoDevice.updateStateOnServer(key=u'currentlyPlayingContentLengthOffset', value=currentOffset)
 					clientDevice.indigoDevice.updateStateOnServer(key=u'currentlyPlayingContentLengthOffsetDisplay', value=str(datetime.timedelta(seconds=currentOffset/1000)))
 					if currentOffset == 0:
-						percentComplete = 0.0
+						percentComplete = 0
 					else:
 						percentComplete = int(((1.0 * currentOffset) / (1.0 * contentDuration)) * 100.0)
-					clientDevice.indigoDevice.updateStateOnServer(key=u'currentlyPlayingContentPercentComplete', value=percentComplete, uiValue='{0:f}%'.format(percentComplete))
+					clientDevice.indigoDevice.updateStateOnServer(key=u'currentlyPlayingContentPercentComplete', value=percentComplete, uiValue='{0:d}%'.format(percentComplete))
 					
 					clientDevice.indigoDevice.updateStateOnServer(key=u'playerDeviceTitle', value=session.playerInfo.get(u'title', u''))
 					
