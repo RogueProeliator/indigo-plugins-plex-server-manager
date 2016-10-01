@@ -85,7 +85,8 @@ class PlexMediaContainer(object):
 		if self.containerType == MEDIACONTAINERTYPE_SESSIONLIST:
 			for video in mediaContainerNode.findall(u'Video'):
 				self.videoSessions.append(PlexMediaContainerVideoSession(video))
-		
+			for audio in mediaContainerNode.findall(u'Track'):
+				self.videoSessions.append(PlexMediaContainerVideoSession(audio))
 		
 		
 #/////////////////////////////////////////////////////////////////////////////////////////
@@ -148,6 +149,12 @@ class PlexMediaClient(object):
 	
 	def getClientName(self):
 		return RPFramework.RPFrameworkUtils.to_unicode(self.clientAttributes["product"] if "product" in self.clientAttributes else "")
+		
+	def getClientAddress(self):
+		return RPFramework.RPFrameworkUtils.to_unicode(self.clientAttributes["address"] if "address" in self.clientAttributes else "")
+		
+	def getClientPort(self):
+		return int(RPFramework.RPFrameworkUtils.to_unicode(self.clientAttributes["port"] if "port" in self.clientAttributes else "0"))
 
 
 

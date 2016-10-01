@@ -12,6 +12,7 @@
 #/////////////////////////////////////////////////////////////////////////////////////////
 import httplib
 import re
+import requests
 import datetime
 import time
 import urllib2
@@ -89,19 +90,42 @@ class PlexMediaServer(RPFramework.RPFrameworkRESTfulDevice.RPFrameworkRESTfulDev
 		# this should be a valid return to have made it here since this will be called as an
 		# effect and not during initial request processing; the obj should be a string
 		plexContainer = plexMediaContainer.PlexMediaContainer(responseObj, rpCommand.getPayloadAsList()[1])
-		self.hostPlugin.logDebugMessage(u'MediaContainer Information: ' + RPFramework.RPFrameworkUtils.to_unicode(plexContainer.containerAttributes), RPFramework.RPFrameworkPlugin.DEBUGLEVEL_MED)
+		self.hostPlugin.logger.debug(u'MediaContainer Information: ' + RPFramework.RPFrameworkUtils.to_unicode(plexContainer.containerAttributes))
 		
 		# assuming this is the primary command then we need to update the current state information
 		# of this device
 		if plexContainer.containerType == plexMediaContainer.MEDIACONTAINERTYPE_SERVERNODE:
-			self.indigoDevice.updateStateOnServer(key=u'connectionState', value=u'Connected')
-			self.indigoDevice.updateStateOnServer(key=u'serverVersion', value=plexContainer.containerAttributes["version"])
-			self.indigoDevice.updateStateOnServer(key=u'transcoderActiveVideoSessions', value=plexContainer.containerAttributes["transcoderActiveVideoSessions"])
+			connectedStateUpdates = [
+				{'key' : u'connectionState', 'value' : u'Connected'},
+				{'key' : u'serverVersion', 'value' : plexContainer.containerAttributes["version"]},
+				{'key' : u'transcoderActiveVideoSessions', 'value' : plexContainer.containerAttributes["transcoderActiveVideoSessions"]}
+			]
+			self.indigoDevice.updateStatesOnServer(connectedStateUpdates)
 		elif plexContainer.containerType == plexMediaContainer.MEDIACONTAINERTYPE_CLIENTLIST:
-			pass
+			# here we have a list of the clients connected to the server; this information may be different than the sessions
+			# list so we will only update client devices or slots where the client ID matches already
+			self.hostPlugin.logger.debug(u'Found ' + RPFramework.RPFrameworkUtils.to_unicode(len(plexContainer.clients)) + u' clients')
+			for plexClientNode in plexContainer.clients:
+				clientNodeMachineId = plexClientNode.getClientId()
+				self.hostPlugin.logger.debug(u'Found client with Machine Id: ' + clientNodeMachineId)
+				if clientNodeMachineId != u'':
+					# determine if we have a match in the devices...
+					if clientNodeMachineId in self.childDevices:
+						clientNodeMatchingDevice = self.childDevices[clientNodeMachineId]
+						clientNodeMatchingStates = [{'key' : u'clientAddress', 'value' : plexClientNode.getClientAddress() }, {'key' : u'clientPort', 'value' : plexClientNode.getClientPort() }]
+						clientNodeMatchingDevice.indigoDevice.updateStatesOnServer(clientNodeMatchingStates)
+					
+					# determine if any of our slots in use match this client Idaho
+					for slotDeviceId in self.childDevices:
+						slotDevice = self.childDevices[slotDeviceId]
+						if slotDevice.indigoDevice.deviceTypeId == u'plexMediaClientSlot':
+							clientNodeMatchingStates = [{'key' : u'clientAddress', 'value' : plexClientNode.getClientAddress() }, {'key' : u'clientPort', 'value' : plexClientNode.getClientPort() }]
+							slotDevice.indigoDevice.updateStatesOnServer(clientNodeMatchingStates)
+						
+			
 		elif plexContainer.containerType == plexMediaContainer.MEDIACONTAINERTYPE_SESSIONLIST:
 			self.indigoDevice.updateStateOnServer(key=u'activeSessionsCount', value=int(plexContainer.containerAttributes["size"]))
-			self.hostPlugin.logDebugMessage(u'Found ' + RPFramework.RPFrameworkUtils.to_unicode(len(plexContainer.videoSessions)) + u' active video sessions', RPFramework.RPFrameworkPlugin.DEBUGLEVEL_MED)
+			self.hostPlugin.logger.debug(u'Found ' + RPFramework.RPFrameworkUtils.to_unicode(len(plexContainer.videoSessions)) + u' active media sessions')
 			
 			# update the status of any child client devices that are currently streaming; we also need to update
 			# the list of available clients for the config dialog boxes
@@ -112,9 +136,9 @@ class PlexMediaServer(RPFramework.RPFrameworkRESTfulDevice.RPFrameworkRESTfulDev
 				slotNum = slotNum + 1
 				
 				# output debug information
-				self.hostPlugin.logDebugMessage(u'MediaContainer Media Information: ' + RPFramework.RPFrameworkUtils.to_unicode(session.mediaInfo), RPFramework.RPFrameworkPlugin.DEBUGLEVEL_MED)
-				self.hostPlugin.logDebugMessage(u'MediaContainer Player Information: ' + RPFramework.RPFrameworkUtils.to_unicode(session.playerInfo), RPFramework.RPFrameworkPlugin.DEBUGLEVEL_MED)
-				self.hostPlugin.logDebugMessage(u'Identified as Slot ' + RPFramework.RPFrameworkUtils.to_unicode(slotNum), RPFramework.RPFrameworkPlugin.DEBUGLEVEL_MED)
+				self.hostPlugin.logger.debug(u'MediaContainer Media Information: ' + RPFramework.RPFrameworkUtils.to_unicode(session.mediaInfo))
+				self.hostPlugin.logger.debug(u'MediaContainer Player Information: ' + RPFramework.RPFrameworkUtils.to_unicode(session.playerInfo))
+				self.hostPlugin.logger.debug(u'Identified as Slot ' + RPFramework.RPFrameworkUtils.to_unicode(slotNum))
 			
 				# retrieve the basic identification information about the player which is
 				# connected for this session
@@ -131,15 +155,16 @@ class PlexMediaServer(RPFramework.RPFrameworkRESTfulDevice.RPFrameworkRESTfulDev
 					clientsToProcess.append(self.childDevices[slotClientId])
 				
 				# process each of the clients found as a match...
-				self.hostPlugin.logDebugMessage(u'Found ' + RPFramework.RPFrameworkUtils.to_unicode(len(clientsToProcess)) + u' clients to update', RPFramework.RPFrameworkPlugin.DEBUGLEVEL_MED)
+				self.hostPlugin.logger.debug(u'Found ' + RPFramework.RPFrameworkUtils.to_unicode(len(clientsToProcess)) + u' clients to update')
 				for clientDevice in clientsToProcess:
-					self.hostPlugin.logDebugMessage(u'Found client device to update for machineID: ' + playerMachineId, RPFramework.RPFrameworkPlugin.DEBUGLEVEL_MED)
-					clientDevice.indigoDevice.updateStateOnServer(key=u'clientConnectionStatus', value=session.playerInfo.get(u'state', u'connected'))
-					clientDevice.indigoDevice.updateStateOnServer(key=u'currentUser', value=session.userInfo.get(u'title', u''))
-					clientDevice.indigoDevice.updateStateOnServer(key=u'currentlyPlayingMediaType', value=session.videoAttributes.get(u'type', u'unknown'))
+					clientStatesToUpdate = []
+					self.hostPlugin.logger.debug(u'Found client device to update for machineID: ' + playerMachineId)
+					clientStatesToUpdate.append({ 'key' : u'clientConnectionStatus', 'value' : session.playerInfo.get(u'state', u'connected') })
+					clientStatesToUpdate.append({ 'key': u'currentUser', 'value' : session.userInfo.get(u'title', u'') })
+					clientStatesToUpdate.append({ 'key' : u'currentlyPlayingMediaType', 'value' : session.videoAttributes.get(u'type', u'unknown')})
 					
 					if clientDevice.indigoDevice.deviceTypeId == u'plexMediaClientSlot':
-						clientDevice.indigoDevice.updateStateOnServer(key=u'clientId', value=playerMachineId)
+						clientStatesToUpdate.append({ 'key' : u'clientId', 'value' : playerMachineId })
 					
 					# the title will depend upon the type... show episodes need the show (parent) appended
 					mediaTitle = session.videoAttributes.get(u'title', u'')
@@ -148,35 +173,42 @@ class PlexMediaServer(RPFramework.RPFrameworkRESTfulDevice.RPFrameworkRESTfulDev
 						if grandparentTitle != u'':
 							grandparentTitle = grandparentTitle + u' : '
 						mediaTitle = grandparentTitle + mediaTitle
-					clientDevice.indigoDevice.updateStateOnServer(key=u'currentlyPlayingTitle', value=mediaTitle)
-					clientDevice.indigoDevice.updateStateOnServer(key=u'currentlyPlayingSummary', value=session.videoAttributes.get(u'summary', u''))
+					clientStatesToUpdate.append({ 'key' : u'currentlyPlayingTitle', 'value' : mediaTitle })
+					clientStatesToUpdate.append({ 'key' : u'currentlyPlayingSummary', 'value' : session.videoAttributes.get(u'summary', u'') })
 					
-					clientDevice.indigoDevice.updateStateOnServer(key=u'currentlyPlayingArtUrl', value=session.videoAttributes.get(u'art', u''))
-					clientDevice.indigoDevice.updateStateOnServer(key=u'currentlyPlayingThumbnailUrl', value=session.videoAttributes.get(u'thumb', u''))
-					clientDevice.indigoDevice.updateStateOnServer(key=u'currentlyPlayingParentThumbnailUrl', value=session.videoAttributes.get(u'parentThumb', u''))
-					clientDevice.indigoDevice.updateStateOnServer(key=u'currentlyPlayingGrandparentArtUrl', value=session.videoAttributes.get(u'grandparentArt', u''))
-					clientDevice.indigoDevice.updateStateOnServer(key=u'currentlyPlayingGrandparentThumbnailUrl', value=session.videoAttributes.get(u'grandparentThumb', u''))
-					clientDevice.indigoDevice.updateStateOnServer(key=u'currentlPlayingTitleYear', value=session.videoAttributes.get(u'year', u''))
-					clientDevice.indigoDevice.updateStateOnServer(key=u'currentlyPlayingStarRating', value=session.videoAttributes.get(u'rating', u''))
-					clientDevice.indigoDevice.updateStateOnServer(key=u'currentlyPlayingContentRating', value=session.videoAttributes.get(u'contentRating', u''))
-					clientDevice.indigoDevice.updateStateOnServer(key=u'currentlyPlayingContentResolution', value=session.mediaInfo.get(u'videoResolution', u''))
+					clientStatesToUpdate.append({ 'key' : u'currentlyPlayingArtUrl', 'value' : session.videoAttributes.get(u'art', u'') })
+					clientStatesToUpdate.append({ 'key' : u'currentlyPlayingThumbnailUrl', 'value' : session.videoAttributes.get(u'thumb', u'') })
+					
+					clientStatesToUpdate.append({ 'key' : u'currentlyPlayingParentTitle', 'value' : session.videoAttributes.get(u'parentTitle', u'') })
+					clientStatesToUpdate.append({ 'key' : u'currentlyPlayingParentThumbnailUrl', 'value' : session.videoAttributes.get(u'parentThumb', u'') })
+					
+					clientStatesToUpdate.append({ 'key' : u'currentlyPlayingGrandparentTitle', 'value' : session.videoAttributes.get(u'grandparentTitle', u'') })
+					clientStatesToUpdate.append({ 'key' : u'currentlyPlayingGrandparentArtUrl', 'value' : session.videoAttributes.get(u'grandparentArt', u'') })
+					clientStatesToUpdate.append({ 'key' : u'currentlyPlayingGrandparentThumbnailUrl', 'value' : session.videoAttributes.get(u'grandparentThumb', u'') })
+					
+					clientStatesToUpdate.append({ 'key' : u'currentlPlayingTitleYear', 'value' : session.videoAttributes.get(u'year', u'') })
+					clientStatesToUpdate.append({ 'key' : u'currentlyPlayingStarRating', 'value' : session.videoAttributes.get(u'rating', u'') })
+					clientStatesToUpdate.append({ 'key' : u'currentlyPlayingContentRating', 'value' : session.videoAttributes.get(u'contentRating', u'') })
+					clientStatesToUpdate.append({ 'key' : u'currentlyPlayingContentResolution', 'value' : session.mediaInfo.get(u'videoResolution', u'') })
 					
 					contentDuration = int(session.videoAttributes.get(u'duration', u'0'))
 					currentOffset = int(session.videoAttributes.get(u'viewOffset', u'0'))
-					clientDevice.indigoDevice.updateStateOnServer(key=u'currentlyPlayingContentLengthMS', value=contentDuration)
-					clientDevice.indigoDevice.updateStateOnServer(key=u'currentlyPlayingContentLengthDisplay', value=str(datetime.timedelta(seconds=contentDuration/1000)))
-					clientDevice.indigoDevice.updateStateOnServer(key=u'currentlyPlayingContentLengthOffset', value=currentOffset)
-					clientDevice.indigoDevice.updateStateOnServer(key=u'currentlyPlayingContentLengthOffsetDisplay', value=str(datetime.timedelta(seconds=currentOffset/1000)))
+					clientStatesToUpdate.append({ 'key' : u'currentlyPlayingContentLengthMS', 'value' : contentDuration })
+					
+					clientStatesToUpdate.append({ 'key' : u'currentlyPlayingContentLengthDisplay', 'value' : str(datetime.timedelta(seconds=contentDuration/1000)) })
+					clientStatesToUpdate.append({ 'key' : u'currentlyPlayingContentLengthOffset', 'value' : currentOffset })
+					clientStatesToUpdate.append({ 'key' : u'currentlyPlayingContentLengthOffsetDisplay', 'value' : str(datetime.timedelta(seconds=currentOffset/1000)) })
 					if currentOffset == 0:
 						percentComplete = 0
 					else:
 						percentComplete = int(((1.0 * currentOffset) / (1.0 * contentDuration)) * 100.0)
-					clientDevice.indigoDevice.updateStateOnServer(key=u'currentlyPlayingContentPercentComplete', value=percentComplete, uiValue='{0:d}%'.format(percentComplete))
+					clientStatesToUpdate.append({ 'key' : u'currentlyPlayingContentPercentComplete', 'value' : percentComplete, 'uiValue' : '{0:d}%'.format(percentComplete) })
 					
-					clientDevice.indigoDevice.updateStateOnServer(key=u'playerDeviceTitle', value=session.playerInfo.get(u'title', u''))
+					clientStatesToUpdate.append({ 'key' : u'playerDeviceTitle', 'value' : session.playerInfo.get(u'title', u'') })
 					
+					clientDevice.indigoDevice.updateStatesOnServer(clientStatesToUpdate)
 				else:
-					self.hostPlugin.logDebugMessage(u'Found unknown client: ' + playerMachineId, RPFramework.RPFrameworkPlugin.DEBUGLEVEL_MED)
+					self.hostPlugin.logger.debug(u'Found unknown client: ' + playerMachineId)
 				
 				# if the player is valid then add it to the currently-connected client list
 				if playerMachineId != u'':
@@ -188,24 +220,29 @@ class PlexMediaServer(RPFramework.RPFrameworkRESTfulDevice.RPFrameworkRESTfulDev
 				if childDevice.indigoDevice.deviceTypeId == u'plexMediaClient':
 					if childDevice.indigoDevice.states.get(u'clientConnectionStatus', u'') != u'disconnected' and not (childDevice.indigoDevice.pluginProps.get(u'plexClientId', u'') in connectedClientHash):
 						# this device was not "seen" so we should mark it as being disconnected
-						childDevice.indigoDevice.updateStateOnServer(key=u'clientConnectionStatus', value=u'disconnected')
-						childDevice.indigoDevice.updateStateOnServer(key=u'currentUser', value=u'')
-						childDevice.indigoDevice.updateStateOnServer(key=u'currentlyPlayingMediaType', value=u'unknown')
-						childDevice.indigoDevice.updateStateOnServer(key=u'currentlyPlayingTitle', value=u'')
-						childDevice.indigoDevice.updateStateOnServer(key=u'currentlyPlayingSummary', value=u'')
-						childDevice.indigoDevice.updateStateOnServer(key=u'currentlyPlayingArtUrl', value=u'')
-						childDevice.indigoDevice.updateStateOnServer(key=u'currentlyPlayingThumbnailUrl', value=u'')
-						childDevice.indigoDevice.updateStateOnServer(key=u'currentlyPlayingParentThumbnailUrl', value=u'')
-						childDevice.indigoDevice.updateStateOnServer(key=u'currentlyPlayingGrandparentArtUrl', value=u'')
-						childDevice.indigoDevice.updateStateOnServer(key=u'currentlyPlayingGrandparentThumbnailUrl', value=u'')
-						childDevice.indigoDevice.updateStateOnServer(key=u'currentlPlayingTitleYear', value=u'')
-						childDevice.indigoDevice.updateStateOnServer(key=u'currentlyPlayingStarRating', value=u'')
-						childDevice.indigoDevice.updateStateOnServer(key=u'currentlyPlayingContentRating', value=u'')
-						childDevice.indigoDevice.updateStateOnServer(key=u'currentlyPlayingContentResolution', value=u'')
-						childDevice.indigoDevice.updateStateOnServer(key=u'currentlyPlayingContentLengthMS', value=0)
-						childDevice.indigoDevice.updateStateOnServer(key=u'currentlyPlayingContentLengthOffset', value=0)
-						childDevice.indigoDevice.updateStateOnServer(key=u'currentlyPlayingContentPercentComplete', value=0)
-						childDevice.indigoDevice.updateStateOnServer(key=u'playerDeviceTitle', value=u'')
+						clientStatesToUpdate = []
+						clientStatesToUpdate.append({ 'key' : u'clientConnectionStatus', 'value' : u'disconnected' })
+						clientStatesToUpdate.append({ 'key' : u'currentUser', 'value' : u'' })
+						clientStatesToUpdate.append({ 'key' : u'currentlyPlayingMediaType', 'value' : u'unknown' })
+						clientStatesToUpdate.append({ 'key' : u'currentlyPlayingTitle', 'value' : u'' })
+						clientStatesToUpdate.append({ 'key' : u'currentlyPlayingSummary', 'value' : u'' })
+						clientStatesToUpdate.append({ 'key' : u'currentlyPlayingArtUrl', 'value' : u'' })
+						clientStatesToUpdate.append({ 'key' : u'currentlyPlayingThumbnailUrl', 'value' : u'' })
+						clientStatesToUpdate.append({ 'key' : u'currentlyPlayingParentTitle', 'value' : u''})
+						clientStatesToUpdate.append({ 'key' : u'currentlyPlayingParentThumbnailUrl', 'value' : u'' })
+						clientStatesToUpdate.append({ 'key' : u'currentlyPlayingGrandparentTitle', 'value' : u'' })
+						clientStatesToUpdate.append({ 'key' : u'currentlyPlayingGrandparentArtUrl', 'value' : u'' })
+						clientStatesToUpdate.append({ 'key' : u'currentlyPlayingGrandparentThumbnailUrl', 'value' : u'' })
+						clientStatesToUpdate.append({ 'key' : u'currentlPlayingTitleYear', 'value' : u'' })
+						clientStatesToUpdate.append({ 'key' : u'currentlyPlayingStarRating', 'value' : u'' })
+						clientStatesToUpdate.append({ 'key' : u'currentlyPlayingContentRating', 'value' : u'' })
+						clientStatesToUpdate.append({ 'key' : u'currentlyPlayingContentResolution', 'value' : u'' })
+						clientStatesToUpdate.append({ 'key' : u'currentlyPlayingContentLengthMS', 'value' : 0 })
+						clientStatesToUpdate.append({ 'key' : u'currentlyPlayingContentLengthOffset', 'value' : 0 })
+						clientStatesToUpdate.append({ 'key' : u'currentlyPlayingContentPercentComplete', 'value' : 0 })
+						clientStatesToUpdate.append({ 'key' : u'playerDeviceTitle', 'value' : u'' })
+						childDevice.indigoDevice.updateStatesOnServer(clientStatesToUpdate)
+						
 				elif childDevice.indigoDevice.deviceTypeId == u'plexMediaClientSlot':
 					clientSlotNumStr = childDevice.indigoDevice.pluginProps.get('plexClientId', 'Slot 99')
 					if clientSlotNumStr == u'':
@@ -213,27 +250,31 @@ class PlexMediaServer(RPFramework.RPFrameworkRESTfulDevice.RPFrameworkRESTfulDev
 					clientSlotNumInt = int(clientSlotNumStr[5:])
 					
 					if clientSlotNumInt > slotNum:
-						childDevice.indigoDevice.updateStateOnServer(key=u'clientConnectionStatus', value=u'disconnected')
-						childDevice.indigoDevice.updateStateOnServer(key=u'currentUser', value=u'')
-						childDevice.indigoDevice.updateStateOnServer(key=u'currentlyPlayingMediaType', value=u'unknown')
-						childDevice.indigoDevice.updateStateOnServer(key=u'currentlyPlayingTitle', value=u'')
-						childDevice.indigoDevice.updateStateOnServer(key=u'currentlyPlayingSummary', value=u'')
-						childDevice.indigoDevice.updateStateOnServer(key=u'currentlyPlayingArtUrl', value=u'')
-						childDevice.indigoDevice.updateStateOnServer(key=u'currentlyPlayingThumbnailUrl', value=u'')
-						childDevice.indigoDevice.updateStateOnServer(key=u'currentlyPlayingParentThumbnailUrl', value=u'')
-						childDevice.indigoDevice.updateStateOnServer(key=u'currentlyPlayingGrandparentArtUrl', value=u'')
-						childDevice.indigoDevice.updateStateOnServer(key=u'currentlyPlayingGrandparentThumbnailUrl', value=u'')
-						childDevice.indigoDevice.updateStateOnServer(key=u'currentlPlayingTitleYear', value=u'')
-						childDevice.indigoDevice.updateStateOnServer(key=u'currentlyPlayingStarRating', value=u'')
-						childDevice.indigoDevice.updateStateOnServer(key=u'currentlyPlayingContentRating', value=u'')
-						childDevice.indigoDevice.updateStateOnServer(key=u'currentlyPlayingContentResolution', value=u'')
-						childDevice.indigoDevice.updateStateOnServer(key=u'currentlyPlayingContentLengthMS', value=0)
-						childDevice.indigoDevice.updateStateOnServer(key=u'currentlyPlayingContentLengthOffset', value=0)
-						childDevice.indigoDevice.updateStateOnServer(key=u'currentlyPlayingContentPercentComplete', value=0)
-						childDevice.indigoDevice.updateStateOnServer(key=u'playerDeviceTitle', value=u'')
+						clientStatesToUpdate = []
+						clientStatesToUpdate.append({ 'key' : u'clientConnectionStatus', 'value' : u'disconnected' })
+						clientStatesToUpdate.append({ 'key' : u'currentUser', 'value' : u'' })
+						clientStatesToUpdate.append({ 'key' : u'currentlyPlayingMediaType', 'value' : u'unknown' })
+						clientStatesToUpdate.append({ 'key' : u'currentlyPlayingTitle', 'value' : u'' })
+						clientStatesToUpdate.append({ 'key' : u'currentlyPlayingSummary', 'value' : u'' })
+						clientStatesToUpdate.append({ 'key' : u'currentlyPlayingArtUrl', 'value' : u'' })
+						clientStatesToUpdate.append({ 'key' : u'currentlyPlayingThumbnailUrl', 'value' : u'' })
+						clientStatesToUpdate.append({ 'key' : u'currentlyPlayingParentTitle', 'value' : u'' })
+						clientStatesToUpdate.append({ 'key' : u'currentlyPlayingParentThumbnailUrl', 'value' : u'' })
+						clientStatesToUpdate.append({ 'key' : u'currentlyPlayingGrandparentTitle', 'value' : u'' })
+						clientStatesToUpdate.append({ 'key' : u'currentlyPlayingGrandparentArtUrl', 'value' : u'' })
+						clientStatesToUpdate.append({ 'key' : u'currentlyPlayingGrandparentThumbnailUrl', 'value' : u'' })
+						clientStatesToUpdate.append({ 'key' : u'currentlPlayingTitleYear', 'value' : u'' })
+						clientStatesToUpdate.append({ 'key' : u'currentlyPlayingStarRating', 'value' : u'' })
+						clientStatesToUpdate.append({ 'key' : u'currentlyPlayingContentRating', 'value' : u'' })
+						clientStatesToUpdate.append({ 'key' : u'currentlyPlayingContentResolution', 'value' : u'' })
+						clientStatesToUpdate.append({ 'key' : u'currentlyPlayingContentLengthMS', 'value' : 0 })
+						clientStatesToUpdate.append({ 'key' : u'currentlyPlayingContentLengthOffset', 'value' : 0 })
+						clientStatesToUpdate.append({ 'key' : u'currentlyPlayingContentPercentComplete', 'value' : 0 })
+						clientStatesToUpdate.append({ 'key' : u'playerDeviceTitle', 'value' : u'' })
+						childDevice.indigoDevice.updateStatesOnServer(clientStatesToUpdate)
 			
 			# update our list of currently connected clients
-			self.hostPlugin.logDebugMessage(u'Updating current client list to: ' + RPFramework.RPFrameworkUtils.to_unicode(newClientList), RPFramework.RPFrameworkPlugin.DEBUGLEVEL_MED)
+			self.hostPlugin.logger.debug(u'Updating current client list to: ' + RPFramework.RPFrameworkUtils.to_unicode(newClientList))
 			self.currentClientList = newClientList
 			self.indigoDevice.updateStateOnServer(key=u'connectedClientCount', value=len(newClientList))
 			
@@ -243,25 +284,7 @@ class PlexMediaServer(RPFramework.RPFrameworkRESTfulDevice.RPFrameworkRESTfulDev
 	#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 	def handleUnmanagedCommandInQueue(self, deviceHTTPAddress, rpCommand):
 		if rpCommand.commandName == u'obtainPlexSecurityToken':
-			# we need to obtain a security token from the plex website in order to_unicode
-			# access the plex server; if we already have a security token this may be skipped
-			if self.plexSecurityToken == u'':
-				plexHeaders = {u'X-Plex-Platform':u'Indigo', u'X-Plex-Platform-Version':indigo.server.apiVersion, u'X-Plex-Provides':u'controller', u'X-Plex-Client-Identifier':indigo.server.getDbName(), u'X-Plex-Product':u'Plex Media Server Manager', u'X-Plex-Version':self.hostPlugin.pluginVersion, u'X-Plex-Device':u'Indigo HA Server', u'X-Plex-Device-Name':u'Indigo Plugin'}
-				
-				responseObj = RPFramework.requests.post(u'https://plex.tv/users/sign_in.xml', headers=plexHeaders, auth=(self.indigoDevice.pluginProps.get(u'plexUsername', u''), self.indigoDevice.pluginProps.get(u'plexPassword', u'')))
-				self.hostPlugin.logDebugMessage(u'Plex.tv Sign-In Response: [' + RPFramework.RPFrameworkUtils.to_unicode(responseObj.status_code) + u'] ' + RPFramework.RPFrameworkUtils.to_unicode(responseObj.text), RPFramework.RPFrameworkPlugin.DEBUGLEVEL_HIGH)
-				self.hostPlugin.logDebugMessage(u'Plex.tv Sign-In Response Headers: ' + RPFramework.RPFrameworkUtils.to_unicode(responseObj.headers), RPFramework.RPFrameworkPlugin.DEBUGLEVEL_HIGH)
-				
-				# if successful, this should be a 201 response (Created)
-				if responseObj.status_code == 201:
-					# the response will be an XML return...
-					authenticationXml = xml.etree.ElementTree.fromstring(RPFramework.RPFrameworkUtils.to_str(responseObj.text))
-					authTokenNode = authenticationXml.find(u'authentication-token')
-					self.plexSecurityToken = authTokenNode.text
-					self.hostPlugin.logDebugMessage(u'Successfully obtained plex.tv authentication token', RPFramework.RPFrameworkPlugin.DEBUGLEVEL_LOW)
-				else:
-					self.plexSecurityToken = u''
-					indigo.server.log(u'Failed to obtain authentication token from plex.tv site.', isError=True)
+			self.retrieveSecurityToken()
 					
 	#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 	# This routine will be called prior to any network operation to allow the addition
@@ -270,7 +293,7 @@ class PlexMediaServer(RPFramework.RPFrameworkRESTfulDevice.RPFrameworkRESTfulDev
 	def addCustomHTTPHeaders(self, httpRequestHeaders):
 		if self.plexSecurityToken != u'':
 			httpRequestHeaders[u'X-Plex-Token'] = self.plexSecurityToken
-			self.hostPlugin.logDebugMessage(u'Added authentication token to request', RPFramework.RPFrameworkPlugin.DEBUGLEVEL_HIGH)
+			self.hostPlugin.logger.threaddebug(u'Added authentication token to request')
 			
 	#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 	# This routine will handle an error as thrown by the REST call... it allows 
@@ -281,7 +304,7 @@ class PlexMediaServer(RPFramework.RPFrameworkRESTfulDevice.RPFrameworkRESTfulDev
 			# this could be an authorization issue...
 			if response.status_code == 401 and self.plexSecurityToken != u'':
 				self.plexSecurityToken = u''
-				self.hostPlugin.logDebugMessage(u'Invalidating security token due to unauthorized response from status request', RPFramework.RPFrameworkPlugin.DEBUGLEVEL_LOW)
+				self.hostPlugin.logger.debug(u'Invalidating security token due to unauthorized response from status request')
 				return
 		super(PlexMediaServer, self).handleRESTfulError(rpCommand, err, response)
 					
@@ -321,6 +344,30 @@ class PlexMediaServer(RPFramework.RPFrameworkRESTfulDevice.RPFrameworkRESTfulDev
 			currentClients.append(("Slot " + RPFramework.RPFrameworkUtils.to_unicode(slotNum), "Slot " + RPFramework.RPFrameworkUtils.to_unicode(slotNum)))
 		
 		return currentClients
+		
+	#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+	# This routine will attempt to obtain the Plex security token from the Plex service
+	#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+	def retrieveSecurityToken(self):
+		# we need to obtain a security token from the plex website in order to_unicode
+		# access the plex server; if we already have a security token this may be skipped
+		if self.plexSecurityToken == u'':
+			plexHeaders = {u'X-Plex-Platform':u'Indigo', u'X-Plex-Platform-Version':indigo.server.apiVersion, u'X-Plex-Provides':u'controller', u'X-Plex-Client-Identifier':indigo.server.getDbName(), u'X-Plex-Product':u'Plex Media Server Manager', u'X-Plex-Version':self.hostPlugin.pluginVersion, u'X-Plex-Device':u'Indigo HA Server', u'X-Plex-Device-Name':u'Indigo Plugin'}
+			
+			responseObj = requests.post(u'https://plex.tv/users/sign_in.xml', headers=plexHeaders, auth=(self.indigoDevice.pluginProps.get(u'plexUsername', u''), self.indigoDevice.pluginProps.get(u'plexPassword', u'')))
+			self.hostPlugin.logger.threaddebug(u'Plex.tv Sign-In Response: [' + RPFramework.RPFrameworkUtils.to_unicode(responseObj.status_code) + u'] ' + RPFramework.RPFrameworkUtils.to_unicode(responseObj.text))
+			self.hostPlugin.logger.threaddebug(u'Plex.tv Sign-In Response Headers: ' + RPFramework.RPFrameworkUtils.to_unicode(responseObj.headers))
+			
+			# if successful, this should be a 201 response (Created)
+			if responseObj.status_code == 201:
+				# the response will be an XML return...
+				authenticationXml = xml.etree.ElementTree.fromstring(RPFramework.RPFrameworkUtils.to_str(responseObj.text))
+				authTokenNode = authenticationXml.find(u'authentication-token')
+				self.plexSecurityToken = authTokenNode.text
+				self.hostPlugin.logger.debug(u'Successfully obtained plex.tv authentication token')
+			else:
+				self.plexSecurityToken = u''
+				self.hostPlugin.logger.error(u'Failed to obtain authentication token from plex.tv site.')
 			
 			
 #/////////////////////////////////////////////////////////////////////////////////////////
@@ -343,10 +390,26 @@ class PlexMediaClient(RPFramework.RPFrameworkNonCommChildDevice.RPFrameworkNonCo
 	def __init__(self, plugin, device):
 		super(PlexMediaClient, self).__init__(plugin, device)
 		
+		self.clientCommandID = 0
+		
 		self.upgradedDeviceStates.append(u'currentlyPlayingParentThumbnailUrl')
 		self.upgradedDeviceStates.append(u'currentlyPlayingGrandparentArtUrl')
 		self.upgradedDeviceStates.append(u'currentlyPlayingSummary')
 		self.upgradedDeviceStates.append(u'playerDeviceTitle')
 		self.upgradedDeviceStates.append(u'currentlyPlayingContentLengthDisplay')
 		self.upgradedDeviceStates.append(u'currentlyPlayingContentLengthOffsetDisplay')
+		self.upgradedDeviceStates.append(u'currentlyPlayingParentTitle')
+		self.upgradedDeviceStates.append(u'currentlyPlayingGrandparentTitle')
+		self.upgradedDeviceStates.append(u'clientAddress')
+		self.upgradedDeviceStates.append(u'clientPort')
+		
+	#/////////////////////////////////////////////////////////////////////////////////////
+	# Utility methods
+	#/////////////////////////////////////////////////////////////////////////////////////
+	#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+	# Returns the command ID to use when sending commands to the client player
+	#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+	def getClientCommandID(self):
+		self.clientCommandID += 1
+		return self.clientCommandID
 		

@@ -108,6 +108,10 @@
 						<commandName>RESTFUL_GET</commandName>
 						<commandFormat>%dp:requestMethod%|*|/status/sessions|*|basic|*|%dp:plexUsername%|*|%dp:plexPassword%</commandFormat>
 					</command>
+					<command>
+						<commandName>RESTFUL_GET</commandName>
+						<commandFormat>%dp:requestMethod%|*|/clients|*|basic|*|%dp:plexUsername%|*|%dp:plexPassword%</commandFormat>
+					</command>
 				</commands>
 			</action>
 			<action indigoId="downloadCurrentlyPlayingArt">
@@ -171,6 +175,26 @@
 					</param>
 					<param indigoId="noArtworkFilename" paramType="ParamTypeOSFilePath" isRequired="False">
 						<invalidValueMessage><![CDATA[Please enter a valid filename for use if no artwork is found (optional)]]></invalidValueMessage>
+					</param>
+				</params>
+			</action>
+			<action indigoId="sendSlotPlaybackCommand">
+				<params>
+					<param indigoId="commandToSend" paramType="ParamTypeString" isRequired="True">
+						<invalidValueMessage><![CDATA[Please select the command to send to the client]]></invalidValueMessage>
+					</param>
+					<param indigoId="mediaType" paramType="ParamTypeString" isRequired="False">
+						<invalidValueMessage><![CDATA[Please select a valid media type (or empty string for none specified)]]></invalidValueMessage>
+					</param>
+				</params>
+			</action>
+			<action indigoId="sendClientPlaybackCommand">
+				<params>
+					<param indigoId="commandToSend" paramType="ParamTypeString" isRequired="True">
+						<invalidValueMessage><![CDATA[Please select the command to send to the client]]></invalidValueMessage>
+					</param>
+					<param indigoId="mediaType" paramType="ParamTypeString" isRequired="False">
+						<invalidValueMessage><![CDATA[Please select a valid media type (or empty string for none specified)]]></invalidValueMessage>
 					</param>
 				</params>
 			</action>

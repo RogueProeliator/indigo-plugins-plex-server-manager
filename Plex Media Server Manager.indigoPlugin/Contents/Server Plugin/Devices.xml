@@ -123,6 +123,16 @@
 				<ControlPageLabel>Connection Status</ControlPageLabel>
 				<ControlPageLabelPrefix>Connection Status is</ControlPageLabelPrefix>
 			</State>
+			<State id="clientAddress">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Client Address</TriggerLabel>
+				<ControlPageLabel>Client Address</ControlPageLabel>
+			</State>
+			<State id="clientPort">
+				<ValueType>Integer</ValueType>
+				<TriggerLabel>Client Port</TriggerLabel>
+				<ControlPageLabel>Client Port</ControlPageLabel>
+			</State>
 			<State id="currentUser">
 				<ValueType>String</ValueType>
 				<TriggerLabel>Current User</TriggerLabel>
@@ -148,10 +158,20 @@
 				<TriggerLabel>Currently Playing Thumbnail URL</TriggerLabel>
 				<ControlPageLabel>Currently Playing Thumbnail URL</ControlPageLabel>
 			</State>
+			<State id="currentlyPlayingParentTitle">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Currently Playing Parent Title</TriggerLabel>
+				<ControlPageLabel>Currently Playing Parent Title</ControlPageLabel>
+			</State>
 			<State id="currentlyPlayingParentThumbnailUrl">
 				<ValueType>String</ValueType>
 				<TriggerLabel>Currently Playing Parent Thumbnail URL</TriggerLabel>
 				<ControlPageLabel>Currently Playing Parent Thumbnail URL</ControlPageLabel>
+			</State>
+			<State id="currentlyPlayingGrandparentTitle">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Currently Playing Grandparent Title</TriggerLabel>
+				<ControlPageLabel>Currently Playing Grandparent Title</ControlPageLabel>
 			</State>
 			<State id="currentlyPlayingGrandparentArtUrl">
 				<ValueType>String</ValueType>
@@ -293,6 +313,16 @@
 				<TriggerLabel>Client ID</TriggerLabel>
 				<ControlPageLabel>Client ID</ControlPageLabel>
 			</State>
+			<State id="clientAddress">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Client Address</TriggerLabel>
+				<ControlPageLabel>Client Address</ControlPageLabel>
+			</State>
+			<State id="clientPort">
+				<ValueType>Integer</ValueType>
+				<TriggerLabel>Client Port</TriggerLabel>
+				<ControlPageLabel>Client Port</ControlPageLabel>
+			</State>
 			<State id="currentUser">
 				<ValueType>String</ValueType>
 				<TriggerLabel>Current User</TriggerLabel>
@@ -318,10 +348,20 @@
 				<TriggerLabel>Currently Playing Thumbnail URL</TriggerLabel>
 				<ControlPageLabel>Currently Playing Thumbnail URL</ControlPageLabel>
 			</State>
+			<State id="currentlyPlayingParentTitle">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Currently Playing Parent Title</TriggerLabel>
+				<ControlPageLabel>Currently Playing Parent Title</ControlPageLabel>
+			</State>
 			<State id="currentlyPlayingParentThumbnailUrl">
 				<ValueType>String</ValueType>
 				<TriggerLabel>Currently Playing Parent Thumbnail URL</TriggerLabel>
 				<ControlPageLabel>Currently Playing Parent Thumbnail URL</ControlPageLabel>
+			</State>
+			<State id="currentlyPlayingGrandparentTitle">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Currently Playing Grandparent Title</TriggerLabel>
+				<ControlPageLabel>Currently Playing Grandparent Title</ControlPageLabel>
 			</State>
 			<State id="currentlyPlayingGrandparentArtUrl">
 				<ValueType>String</ValueType>

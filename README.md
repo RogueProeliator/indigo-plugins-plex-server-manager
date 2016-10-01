@@ -1,5 +1,7 @@
 #Introduction
-This Indigo 6.0+ plugin allows Indigo to monitor, and in the future control, Plex Media Server installations and their connected clients. Plex Media Server is a popular media-streaming server that can run on OS X, among other platforms, and stream to supported clients as well as over DLNA. This plugin supports v0.9+ using the official XML-based API.
+This Indigo 6.1+ plugin allows Indigo to monitor, and in the future control, Plex Media Server installations and their connected clients. Plex Media Server is a popular media-streaming server that can run on OS X, among other platforms, and stream to supported clients as well as over DLNA. This plugin supports v0.9+ using the official XML-based API.
+
+_**INDIGO 6 IMPORTANT NOTE:**_ The Indigo 6 version of this plugin is end-of-life with respect to new development, however the latest stable version on Indigo 6 is [still available](https://github.com/RogueProeliator/IndigoPlugins-Plex-Server-Manager-Plugin/releases/tag/v1.2.1) on the releases page and is working as expected at the moment. Please consider an upgrade to Indigo 7 to support further development of our favorite HA platform!
 
 #Software Requirements
 This plugin should work on any Plex Media Server v0.9 and above; it has been developed and tested against v0.9.11. For some features you may need an account registered with Plex.tv... but a Plex Pass subscription should not be necessary.
@@ -40,6 +42,8 @@ The plugin tracks several devices states which are updated according to the poll
 
 ###Plex Media Client Device States
 - **clientConnectionStatus**: the current state of the client -- Connected, Not Connected, Paused, Buffering, or Playing
+- **clientAddress**: the IP address of the connected client
+- **clientPort**: the IP address on which the connected client is communicating for Plex commands
 - **currentUser**: the name of the current user logged in via the client
 - **currentlyPlayingTitle**: the title of the currently playing media (title of the movie or "Series : Episode Title" for TV shows)
 - **currentlyPlayingSummary**: the summary/description provided for the currently playing media

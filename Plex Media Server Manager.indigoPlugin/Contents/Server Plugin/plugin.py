@@ -23,6 +23,9 @@
 #		Added Currently Playing Summary state - description of the show
 #		Added Device Title state
 #		Added art download action for Slot devices
+#	Version 2.0.1:
+#		Updated API to use Indigo 7 API calls
+#		Consolidated server state updates into new mass-update API calls
 #
 #/////////////////////////////////////////////////////////////////////////////////////////
 #/////////////////////////////////////////////////////////////////////////////////////////
@@ -33,6 +36,7 @@
 #/////////////////////////////////////////////////////////////////////////////////////////
 import operator
 import re
+import requests
 import shutil
 import socket
 import string
@@ -88,9 +92,9 @@ class Plugin(RPFramework.RPFrameworkPlugin.RPFrameworkPlugin):
 	#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 	def getConnectedClients(self, filter=u'', valuesDict=None, typeId=u'', targetId=0):
 		mediaServerId = valuesDict.get(u'mediaServer', u'')
-		self.logDebugMessage(u'Retrieving clients for device of type ' + typeId, RPFramework.RPFrameworkPlugin.DEBUGLEVEL_HIGH)
+		self.logger.threaddebug(u'Retrieving clients for device of type ' + typeId)
 		if mediaServerId == u'':
-			self.logDebugMessage(u'Cannot retrieve connected clients for dialog menu - no media server specified.', RPFramework.RPFrameworkPlugin.DEBUGLEVEL_MED)
+			self.logger.debug(u'Cannot retrieve connected clients for dialog menu - no media server specified.')
 			return list()
 		elif typeId == u'plexMediaClientSlot':
 			return self.managedDevices[int(mediaServerId)].retrieveCurrentClientSlotMenu()
@@ -127,8 +131,8 @@ class Plugin(RPFramework.RPFrameworkPlugin.RPFrameworkPlugin):
 		paramValues = pluginAction.props
 		validationResults = rpAction.validateActionValues(paramValues)
 		if validationResults[0] == False:
-			indigo.server.log(u'Invalid values sent for action "Download Currently Playing Art for Slot"; the following errors were found:', isError=True)
-			indigo.server.log(RPFramework.RPFrameworkUtils.to_unicode(validationResults[2]), isError=True)
+			self.logger.error(u'Invalid values sent for action "Download Currently Playing Art for Slot"; the following errors were found:')
+			self.logger.error(RPFramework.RPFrameworkUtils.to_unicode(validationResults[2]))
 			return
 			
 		# the first thing that is required is that we have art to download... this can come from the
@@ -150,7 +154,7 @@ class Plugin(RPFramework.RPFrameworkPlugin.RPFrameworkPlugin):
 		# we only download the art if a valid URL was found...
 		if artUrlPath == u'':
 			# log the "event"
-			self.logDebugMessage(u'No art found for download: ' + paramValues.get(u'artElement', u'') + u' for clientId: ' + RPFramework.RPFrameworkUtils.to_unicode(pluginAction.deviceId), RPFramework.RPFrameworkPlugin.DEBUGLEVEL_MED)
+			self.logger.debug(u'No art found for download: ' + paramValues.get(u'artElement', u'') + u' for clientId: ' + RPFramework.RPFrameworkUtils.to_unicode(pluginAction.deviceId))
 			
 			# determine if we need to copy a placeholder image over to the destination
 			placeholderImageFN = paramValues.get(u'noArtworkFilename', u'')
@@ -158,7 +162,7 @@ class Plugin(RPFramework.RPFrameworkPlugin.RPFrameworkPlugin):
 				try:
 					shutil.copy2(RPFramework.RPFrameworkUtils.to_str(placeholderImageFN), RPFramework.RPFrameworkUtils.to_str(destinationFN))
 				except:
-					self.logErrorMessage(u'Error copying No Artwork file to destination');
+					self.logger.error(u'Error copying No Artwork file to destination');
 		else:
 			# we found art to download... we just need to queue this download as a normal file download
 			# command for the client
@@ -184,7 +188,57 @@ class Plugin(RPFramework.RPFrameworkPlugin.RPFrameworkPlugin):
 			elif resizeMethod == u'max':
 				resizeWidth = int(paramValues.get(u'imageResizeMaxDimension', '0'))
 			
-			self.logDebugMessage(u'Scheduling download of art at ' + artUrlPath, RPFramework.RPFrameworkPlugin.DEBUGLEVEL_MED)
+			self.logger.debug(u'Scheduling download of art at ' + artUrlPath)
 			plexServerDevice.queueDeviceCommand(RPFramework.RPFrameworkCommand.RPFrameworkCommand(RPFramework.RPFrameworkRESTfulDevice.CMD_DOWNLOADIMAGE, commandPayload=(httpMethod, artUrlPath, u'', u'', u'', destinationFN, resizeWidth, resizeHeight), parentAction=rpAction))
 			
-	
+	#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+	# This callback will handle actions which send a command directly to a client in order
+	# to directly control the client (navigation, playback, etc.)
+	#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+	def sendClientPlaybackCommand(self, pluginAction):
+		# retrieve the action from the list of actions so that we can validate the parameters...
+		rpAction = self.indigoActions[pluginAction.pluginTypeId]
+		paramValues = pluginAction.props
+		validationResults = rpAction.validateActionValues(paramValues)
+		if validationResults[0] == False:
+			self.logger.error(u'Invalid values sent for action "Send Playback Command"; the following errors were found:')
+			self.logger.error(RPFramework.RPFrameworkUtils.to_unicode(validationResults[2]))
+			return
+			
+		# obtain our instance of the client device and ensure that we have all the information necessary
+		# to execute the request
+		plexClientDevice = self.managedDevices[pluginAction.deviceId]
+		clientAddress = plexClientDevice.indigoDevice.states.get(u'clientAddress', u'')
+		clientPort = int(plexClientDevice.indigoDevice.states.get(u'clientPort', u'0'))
+		if plexClientDevice.indigoDevice.deviceTypeId == u'plexMediaClientSlot':
+			plexClientMachineId = plexClientDevice.indigoDevice.states.get(u'clientId', u'')
+		else:
+			plexClientMachineId = plexClientDevice.indigoDevice.pluginProps.get(u'address', u'')
+		mediaServer = int(plexClientDevice.indigoDevice.pluginProps.get(u'mediaServer', u'0'))
+		
+		if clientAddress == u'' or clientPort <= 0 or plexClientMachineId == u'':
+			self.logger.error(u'Cannot send client playback command since the client address has not yet been determined.')
+			return
+		elif mediaServer == 0:
+			self.logger.error(u'Plex Client Indigo Device is not assigned to a Plex Media Server; please edit the device and select the associated server.')
+			return
+			
+		# the server must be authenticated properly or else the command may be rejected
+		plexServerDevice = self.managedDevices[int(mediaServer)]
+		plexServerDevice.retrieveSecurityToken()
+		
+		# a media type may or may not be specified
+		selectedMediaType = paramValues.get(u'mediaType', u'')
+		if selectedMediaType == u'':
+			mediaTypeParam = ''
+		else:
+			mediaTypeParam = u'&mtype=' + selectedMediaType
+		
+		# execute the request to the client...
+		targetUrl = u'http://' + clientAddress + u':' + str(clientPort) + u'/player/' + paramValues.get(u'commandToSend').replace(u'-', u'/') + u'?commandID=' + str(plexClientDevice.getClientCommandID()) + mediaTypeParam
+		plexHeaders = {u'X-Plex-Platform':u'Indigo', u'X-Plex-Platform-Version':indigo.server.apiVersion, u'X-Plex-Provides':u'controller', u'X-Plex-Client-Identifier':indigo.server.getDbName(), u'X-Plex-Product':u'PlexAPI', u'X-Plex-Version':self.pluginVersion, u'X-Plex-Device':u'Indigo HA Server', u'X-Plex-Device-Name':u'Indigo Plugin', u'X-Plex-Token':plexServerDevice.plexSecurityToken, u'X-Plex-Target-Client-Identifier':plexClientMachineId}
+		self.logger.threaddebug(u'Sending client playback command: ' + targetUrl + ' with headers: ' + RPFramework.RPFrameworkUtils.to_unicode(plexHeaders))
+		responseObj = requests.get(targetUrl, headers=plexHeaders)
+		
+		self.logger.debug(u'Client Command Response: [' + unicode(responseObj.status_code) + u'] ' + responseObj.text)
+		

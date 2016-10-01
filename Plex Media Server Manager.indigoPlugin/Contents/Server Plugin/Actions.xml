@@ -104,4 +104,93 @@
 			</Field>
 		</ConfigUI>
 	</Action>
+	<Action id="sep01" />
+	<Action id="sendClientPlaybackCommand" deviceFilter="self.plexMediaClient">
+		<Name>Send Playback Command to Specific Client</Name>
+		<CallbackMethod>sendClientPlaybackCommand</CallbackMethod>
+		<ConfigUI>
+			<Field id="actionTitle" type="label" fontColor="darkGray">
+				<Label>SEND CLIENT COMMAND</Label>
+			</Field>
+			<Field id="instructionSeparator1" type="separator" />
+			<Field id="instructions" type="label" fontSize="small">
+				<Label>Not all clients support remote media controls and some may implement only the basic commands (e.g. play and pause)</Label>
+			</Field>
+			<Field id="commandToSend" type="menu">
+				<Label>Command to Send:</Label>
+				<List>
+					<Option value="playback-play">Play</Option>
+					<Option value="playback-pause">Pause</Option>
+					<Option value="playback-stop">Stop</Option>
+					<Option value="playback-skipPrevious">Previous</Option>
+					<Option value="playback-skipNext">Next</Option>
+					<Option value="playback-stepBack">Skip Back</Option>
+					<Option value="playback-stepForward">Skip Forward</Option>
+					
+					<Option value="navigation-moveUp">Up</Option>
+					<Option value="navigation-moveDown">Down</Option>
+					<Option value="navigation-moveLeft">Left</Option>
+					<Option value="navigation-moveRight">Right</Option>
+					<Option value="navigation-select">Select</Option>
+					<Option value="navigation-back">Back</Option>
+				</List>
+			</Field>
+			<Field id="mediaTypeInstr" type="label" fontSize="small" alignWithControl="true">
+				<Label>Some clients may play more than one media type and allow specifying the media type to control; this is only necessary if your clients supports simultaneous playback - such as music in the background and photo slideshow in the foreground; this parameter is rarely needed.</Label>
+			</Field>
+			<Field id="mediaType" type="menu">
+				<Label>Media Type:</Label>
+				<List>
+					<Option value="">-- Not Specified / Required --</Option>
+					<Option value="music">Music</Option>
+					<Option value="photo">Photo</Option>
+					<Option value="video">Video</Option>
+				</List>
+			</Field>
+		</ConfigUI>
+	</Action>
+	<Action id="sendSlotPlaybackCommand" deviceFilter="self.plexMediaClientSlot">
+		<Name>Send Playback Command to Slot</Name>
+		<CallbackMethod>sendClientPlaybackCommand</CallbackMethod>
+		<ConfigUI>
+			<Field id="actionTitle" type="label" fontColor="darkGray">
+				<Label>SEND CLIENT COMMAND</Label>
+			</Field>
+			<Field id="instructionSeparator1" type="separator" />
+			<Field id="instructions" type="label" fontSize="small">
+				<Label>Not all clients support remote media controls and some may implement only the basic commands (e.g. play and pause)</Label>
+			</Field>
+			<Field id="commandToSend" type="menu">
+				<Label>Command to Send:</Label>
+				<List>
+					<Option value="playback-play">Play</Option>
+					<Option value="playback-pause">Pause</Option>
+					<Option value="playback-stop">Stop</Option>
+					<Option value="playback-skipPrevious">Previous</Option>
+					<Option value="playback-skipNext">Next</Option>
+					<Option value="playback-stepBack">Skip Back</Option>
+					<Option value="playback-stepForward">Skip Forward</Option>
+					
+					<Option value="navigation-moveUp">Up</Option>
+					<Option value="navigation-moveDown">Down</Option>
+					<Option value="navigation-moveLeft">Left</Option>
+					<Option value="navigation-moveRight">Right</Option>
+					<Option value="navigation-select">Select</Option>
+					<Option value="navigation-back">Back</Option>
+				</List>
+			</Field>
+			<Field id="mediaTypeInstr" type="label" fontSize="small" alignWithControl="true">
+				<Label>Some clients may play more than one media type and allow specifying the media type to control; this is only necessary if your clients supports simultaneous playback - such as music in the background and photo slideshow in the foreground; this parameter is rarely needed.</Label>
+			</Field>
+			<Field id="mediaType" type="menu">
+				<Label>Media Type:</Label>
+				<List>
+					<Option value="">-- Not Specified / Required --</Option>
+					<Option value="music">Music</Option>
+					<Option value="photo">Photo</Option>
+					<Option value="video">Video</Option>
+				</List>
+			</Field>
+		</ConfigUI>
+	</Action>
 </Actions>
