@@ -69,3 +69,6 @@ This allows you to download the various artwork associated with the currently pl
 plexMediaServerManager = indigo.server.getPlugin("com.duncanware.plexMediaServerManager")
 plexMediaServerManager.executeAction("downloadCurrentlyPlayingArt", <YOUR_DEVICE_ID>, props={"artElement":"art", "saveToFilename":"/Users/aashe/Pictures/CurrentlyPlayingArt.png", "noArtworkFilename":"/Users/aashe/Pictures/NoArtworkAvailablePlaceholder.png"})
 ```
+
+###Send Playback Command###
+This action allows sending certain playback commands to any Plex client... basic commands such as play, pause, stop, forward/back, etc. are supported by the Plex API and this plugin. Note, however that some clients do not support accepting commands from Plex or only support a subset of those available.
