@@ -9,6 +9,7 @@ VERSION HISTORY
 Version 2.0.0 [??]:
 * Updated to full Indigo 7 support; Indigo 7 is now required for v2.0.0+
 * Significantly faster updates when clients are found, reduced CPU usage during updates
+* Added ability to control connected clients from the plugin
 
 v1.2.1 [August 2016]:
 * Fixed issue when running under Python 2.7
