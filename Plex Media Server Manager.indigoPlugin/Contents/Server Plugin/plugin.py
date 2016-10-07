@@ -217,7 +217,7 @@ class Plugin(RPFramework.RPFrameworkPlugin.RPFrameworkPlugin):
 		mediaServer = int(plexClientDevice.indigoDevice.pluginProps.get(u'mediaServer', u'0'))
 		
 		if clientAddress == u'' or clientPort <= 0 or plexClientMachineId == u'':
-			self.logger.error(u'Cannot send client playback command since the client address has not yet been determined.')
+			self.logger.warning(u'Cannot send client playback command since the client address has not yet been determined.')
 			return
 		elif mediaServer == 0:
 			self.logger.error(u'Plex Client Indigo Device is not assigned to a Plex Media Server; please edit the device and select the associated server.')

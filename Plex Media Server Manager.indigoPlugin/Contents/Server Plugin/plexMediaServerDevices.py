@@ -112,13 +112,14 @@ class PlexMediaServer(RPFramework.RPFrameworkRESTfulDevice.RPFrameworkRESTfulDev
 					# determine if we have a match in the devices...
 					if clientNodeMachineId in self.childDevices:
 						clientNodeMatchingDevice = self.childDevices[clientNodeMachineId]
-						clientNodeMatchingStates = [{'key' : u'clientAddress', 'value' : plexClientNode.getClientAddress() }, {'key' : u'clientPort', 'value' : plexClientNode.getClientPort() }]
-						clientNodeMatchingDevice.indigoDevice.updateStatesOnServer(clientNodeMatchingStates)
+						if clientNodeMatchingDevice.indigoDevice.states.get(u'clientConnectionStatus', u'') != u'disconnected':
+							clientNodeMatchingStates = [{'key' : u'clientAddress', 'value' : plexClientNode.getClientAddress() }, {'key' : u'clientPort', 'value' : plexClientNode.getClientPort() }]
+							clientNodeMatchingDevice.indigoDevice.updateStatesOnServer(clientNodeMatchingStates)
 					
 					# determine if any of our slots in use match this client Idaho
 					for slotDeviceId in self.childDevices:
 						slotDevice = self.childDevices[slotDeviceId]
-						if slotDevice.indigoDevice.deviceTypeId == u'plexMediaClientSlot':
+						if slotDevice.indigoDevice.deviceTypeId == u'plexMediaClientSlot' and slotDevice.indigoDevice.states[u'clientId'] == clientNodeMachineId:
 							clientNodeMatchingStates = [{'key' : u'clientAddress', 'value' : plexClientNode.getClientAddress() }, {'key' : u'clientPort', 'value' : plexClientNode.getClientPort() }]
 							slotDevice.indigoDevice.updateStatesOnServer(clientNodeMatchingStates)
 						
@@ -222,6 +223,8 @@ class PlexMediaServer(RPFramework.RPFrameworkRESTfulDevice.RPFrameworkRESTfulDev
 						# this device was not "seen" so we should mark it as being disconnected
 						clientStatesToUpdate = []
 						clientStatesToUpdate.append({ 'key' : u'clientConnectionStatus', 'value' : u'disconnected' })
+						clientStatesToUpdate.append({ 'key' : u'clientAddress', 'value' : u'' })
+						clientStatesToUpdate.append({ 'key' : u'clientPort', 'value' : 0 })
 						clientStatesToUpdate.append({ 'key' : u'currentUser', 'value' : u'' })
 						clientStatesToUpdate.append({ 'key' : u'currentlyPlayingMediaType', 'value' : u'unknown' })
 						clientStatesToUpdate.append({ 'key' : u'currentlyPlayingTitle', 'value' : u'' })
@@ -238,7 +241,9 @@ class PlexMediaServer(RPFramework.RPFrameworkRESTfulDevice.RPFrameworkRESTfulDev
 						clientStatesToUpdate.append({ 'key' : u'currentlyPlayingContentRating', 'value' : u'' })
 						clientStatesToUpdate.append({ 'key' : u'currentlyPlayingContentResolution', 'value' : u'' })
 						clientStatesToUpdate.append({ 'key' : u'currentlyPlayingContentLengthMS', 'value' : 0 })
+						clientStatesToUpdate.append({ 'key' : u'currentlyPlayingContentLengthDisplay', 'value' : u'' })
 						clientStatesToUpdate.append({ 'key' : u'currentlyPlayingContentLengthOffset', 'value' : 0 })
+						clientStatesToUpdate.append({ 'key' : u'currentlyPlayingContentLengthOffsetDisplay', 'value' : u'' })
 						clientStatesToUpdate.append({ 'key' : u'currentlyPlayingContentPercentComplete', 'value' : 0 })
 						clientStatesToUpdate.append({ 'key' : u'playerDeviceTitle', 'value' : u'' })
 						childDevice.indigoDevice.updateStatesOnServer(clientStatesToUpdate)
@@ -252,6 +257,9 @@ class PlexMediaServer(RPFramework.RPFrameworkRESTfulDevice.RPFrameworkRESTfulDev
 					if clientSlotNumInt > slotNum:
 						clientStatesToUpdate = []
 						clientStatesToUpdate.append({ 'key' : u'clientConnectionStatus', 'value' : u'disconnected' })
+						clientStatesToUpdate.append({ 'key' : u'clientAddress', 'value' : u'' })
+						clientStatesToUpdate.append({ 'key' : u'clientPort', 'value' : 0 })
+						clientStatesToUpdate.append({ 'key' : u'clientId', 'value' : u'' })
 						clientStatesToUpdate.append({ 'key' : u'currentUser', 'value' : u'' })
 						clientStatesToUpdate.append({ 'key' : u'currentlyPlayingMediaType', 'value' : u'unknown' })
 						clientStatesToUpdate.append({ 'key' : u'currentlyPlayingTitle', 'value' : u'' })
@@ -268,7 +276,9 @@ class PlexMediaServer(RPFramework.RPFrameworkRESTfulDevice.RPFrameworkRESTfulDev
 						clientStatesToUpdate.append({ 'key' : u'currentlyPlayingContentRating', 'value' : u'' })
 						clientStatesToUpdate.append({ 'key' : u'currentlyPlayingContentResolution', 'value' : u'' })
 						clientStatesToUpdate.append({ 'key' : u'currentlyPlayingContentLengthMS', 'value' : 0 })
+						clientStatesToUpdate.append({ 'key' : u'currentlyPlayingContentLengthDisplay', 'value' : u'' })
 						clientStatesToUpdate.append({ 'key' : u'currentlyPlayingContentLengthOffset', 'value' : 0 })
+						clientStatesToUpdate.append({ 'key' : u'currentlyPlayingContentLengthOffsetDisplay', 'value' : u'' })
 						clientStatesToUpdate.append({ 'key' : u'currentlyPlayingContentPercentComplete', 'value' : 0 })
 						clientStatesToUpdate.append({ 'key' : u'playerDeviceTitle', 'value' : u'' })
 						childDevice.indigoDevice.updateStatesOnServer(clientStatesToUpdate)
