@@ -16,7 +16,6 @@
 	<Field type="label" id="debugSpacer" fontSize="small">
 		<Label></Label>
 	</Field>
-	
 	<Field id="debugOptionsTitle" type="label" fontColor="darkGray">
 		<Label>DEBUGGING OPTIONS</Label>
 	</Field>
