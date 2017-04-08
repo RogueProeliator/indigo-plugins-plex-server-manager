@@ -1,4 +1,4 @@
-#Introduction
+# Introduction
 This Indigo 6.1+ plugin allows Indigo to monitor, and in the future control, Plex Media Server installations and their connected clients. Plex Media Server is a popular media-streaming server that can run on OS X, among other platforms, and stream to supported clients as well as over DLNA. This plugin supports v0.9+ using the official XML-based API.
 
 _**INDIGO 6 IMPORTANT NOTE:**_ The Indigo 6 version of this plugin is end-of-life with respect to new development, however the latest stable version on Indigo 6 is [still available](https://github.com/RogueProeliator/IndigoPlugins-Plex-Server-Manager-Plugin/releases/tag/v1.2.1) on the releases page and is working as expected at the moment. Please consider an upgrade to Indigo 7 to support further development of our favorite HA platform!
