@@ -10,7 +10,7 @@ This plugin should work on any Plex Media Server v0.9 and above; it has been dev
 The first step is to ensure that your receiver is connected to the network; the menu system will vary by model, but generally this is pretty easy to setup for those models with an On Screen Display. Additionally, some models require that you enable network control of the receiver -- please check your menus/settings or manual for more information.
 
 # Installation and Configuration
-###O btaining the Plugin
+### Obtaining the Plugin
 The latest released version of the plugin is available for download in the Releases section... those versions in beta will be marked as a Pre-Release and will not appear in update notifications.
 
 ### Configuring the Plugin
