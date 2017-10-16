@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <Actions>
-	<Action id="downloadCurrentlyPlayingArt" deviceFilter="self.plexMediaClient">
+	<Action id="downloadCurrentlyPlayingArt" uiPath="DeviceActions" deviceFilter="self.plexMediaClient">
 		<Name>Download Currently Playing Art</Name>
 		<CallbackMethod>downloadCurrentlyPlayingArt</CallbackMethod>
 		<ConfigUI>
@@ -52,7 +52,7 @@
 			</Field>
 		</ConfigUI>
 	</Action>
-	<Action id="downloadCurrentlyPlayingSlotArt" deviceFilter="self.plexMediaClientSlot">
+	<Action id="downloadCurrentlyPlayingSlotArt" uiPath="DeviceActions" deviceFilter="self.plexMediaClientSlot">
 		<Name>Download Currently Playing Art for Slot</Name>
 		<CallbackMethod>downloadCurrentlyPlayingArt</CallbackMethod>
 		<ConfigUI>
@@ -104,8 +104,8 @@
 			</Field>
 		</ConfigUI>
 	</Action>
-	<Action id="sep01" />
-	<Action id="sendClientPlaybackCommand" deviceFilter="self.plexMediaClient">
+	<Action id="sep01" uiPath="DeviceActions" />
+	<Action id="sendClientPlaybackCommand" uiPath="DeviceActions" deviceFilter="self.plexMediaClient">
 		<Name>Send Playback Command to Specific Client</Name>
 		<CallbackMethod>sendClientPlaybackCommand</CallbackMethod>
 		<ConfigUI>
@@ -149,7 +149,7 @@
 			</Field>
 		</ConfigUI>
 	</Action>
-	<Action id="sendSlotPlaybackCommand" deviceFilter="self.plexMediaClientSlot">
+	<Action id="sendSlotPlaybackCommand" uiPath="DeviceActions" deviceFilter="self.plexMediaClientSlot">
 		<Name>Send Playback Command to Slot</Name>
 		<CallbackMethod>sendClientPlaybackCommand</CallbackMethod>
 		<ConfigUI>

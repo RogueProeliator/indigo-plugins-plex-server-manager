@@ -5,7 +5,7 @@
 		<CallbackMethod>toggleDebugEnabled</CallbackMethod>
 	</MenuItem>
 	<MenuItem id="debugDumpDeviceDetails">
-		<Name>Log Device Details</Name>
+		<Name>Log Device Details...</Name>
 		<CallbackMethod>dumpDeviceDetailsToLog</CallbackMethod>
 		<ButtonTitle>Output</ButtonTitle>
 		<ConfigUI>
@@ -24,7 +24,7 @@
 	</MenuItem>
 	<MenuItem id="updateSectionSeparator" />
 	<MenuItem id="checkForUpdateImmediate">
-		<Name>Check for Updates</Name>
+		<Name>Check for Updates...</Name>
 		<ConfigUI>
 			<Field id="versionCheckTitle" type="label" fontColor="darkGray">
 				<Label>PLUGIN UPDATE CHECK</Label>

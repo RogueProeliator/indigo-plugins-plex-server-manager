@@ -6,6 +6,10 @@ To update to the latest version of the application, please download the latest r
 =================================
 VERSION HISTORY
 =================================
+Version 2.0.4 [October 2017]:
+* Minor UI Updates
+* Migrated Actions to the Device Actions sub menu
+
 Version 2.0.3 [April 2017]:
 * Fixed bug that failed to log the detailed error messages on some command failures
 
