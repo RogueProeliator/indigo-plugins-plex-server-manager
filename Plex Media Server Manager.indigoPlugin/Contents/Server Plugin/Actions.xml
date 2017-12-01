@@ -4,10 +4,6 @@
 		<Name>Download Currently Playing Art</Name>
 		<CallbackMethod>downloadCurrentlyPlayingArt</CallbackMethod>
 		<ConfigUI>
-			<Field id="actionTitle" type="label" fontColor="darkGray">
-				<Label>DOWNLOAD CURRENTLY PLAYING ART</Label>
-			</Field>
-			<Field id="instructionSeparator1" type="separator" />
 			<Field id="instructions" type="label" fontSize="small">
 				<Label>This action allows you to retrieve the selected Plex art image for the currently-playing media item.</Label>
 			</Field>
@@ -56,10 +52,6 @@
 		<Name>Download Currently Playing Art for Slot</Name>
 		<CallbackMethod>downloadCurrentlyPlayingArt</CallbackMethod>
 		<ConfigUI>
-			<Field id="actionTitle" type="label" fontColor="darkGray">
-				<Label>DOWNLOAD CURRENTLY PLAYING ART</Label>
-			</Field>
-			<Field id="instructionSeparator1" type="separator" />
 			<Field id="instructions" type="label" fontSize="small">
 				<Label>This action allows you to retrieve the selected Plex art image for the currently-playing media item for a Slot client.</Label>
 			</Field>
@@ -109,10 +101,6 @@
 		<Name>Send Playback Command to Specific Client</Name>
 		<CallbackMethod>sendClientPlaybackCommand</CallbackMethod>
 		<ConfigUI>
-			<Field id="actionTitle" type="label" fontColor="darkGray">
-				<Label>SEND CLIENT COMMAND</Label>
-			</Field>
-			<Field id="instructionSeparator1" type="separator" />
 			<Field id="instructions" type="label" fontSize="small">
 				<Label>Not all clients support remote media controls and some may implement only the basic commands (e.g. play and pause)</Label>
 			</Field>
@@ -153,10 +141,6 @@
 		<Name>Send Playback Command to Slot</Name>
 		<CallbackMethod>sendClientPlaybackCommand</CallbackMethod>
 		<ConfigUI>
-			<Field id="actionTitle" type="label" fontColor="darkGray">
-				<Label>SEND CLIENT COMMAND</Label>
-			</Field>
-			<Field id="instructionSeparator1" type="separator" />
 			<Field id="instructions" type="label" fontSize="small">
 				<Label>Not all clients support remote media controls and some may implement only the basic commands (e.g. play and pause)</Label>
 			</Field>

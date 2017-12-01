@@ -5,8 +5,8 @@
 	<Device type="custom" id="plexMediaServer">
 		<Name>Plex Media Server</Name>
 		<ConfigUI>
-			<Field id="commOptionsTitle" type="label" fontColor="darkGray">
-				<Label>NETWORK OPTIONS</Label>
+			<Field id="commOptionsTitle" type="label" fontColor="darkGray" fontSize="small">
+				<Label>CONNECTION OPTIONS</Label>
 			</Field>
 			<Field id="instructionSeparator1" type="separator" />
 			<Field id="deviceSelectionInstructions" type="label" fontSize="small">

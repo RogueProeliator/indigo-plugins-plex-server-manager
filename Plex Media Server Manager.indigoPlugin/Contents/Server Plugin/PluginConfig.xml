@@ -1,13 +1,16 @@
 <?xml version="1.0"?>
 <PluginConfig>	
-	<Field id="commOptionsTitle" type="label" fontColor="darkGray">
-		<Label>UPDATE NOTIFICATION OPTIONS</Label>
-	</Field>
-	<Field id="updateSectionSeparator2" type="separator" />
+	<Field id="pluginTitleLabel" type="label">
+        <Label>Plex Media Server Manager</Label>
+    </Field>
+    <Field id="pluginAuthorLabel" type="label" fontSize="small">
+        <Label>Developed by RogueProeliator</Label>
+    </Field>
+    <Field id="headerSpacer" type="label" fontSize="mini"/>
 	<Field type="label" id="updaterInstructions" fontSize="small">
 		<Label>This plugin may optionally email you to notify when updates are available; to do so, you must enable the notifications, enter an email address and ensure that email sending is configured in Indigo's preferences.</Label>
 	</Field>
-	<Field id="updaterEmailsEnabled" type="checkbox" defaultValue="true">
+	<Field id="updaterEmailsEnabled" type="checkbox" defaultValue="true" fontSize="small">
 	   <Label>Enable Update Notifications:</Label>
 	</Field>
 	<Field id="updaterEmail" type="textfield">
@@ -16,7 +19,7 @@
 	<Field type="label" id="debugSpacer" fontSize="small">
 		<Label></Label>
 	</Field>
-	<Field id="debugOptionsTitle" type="label" fontColor="darkGray">
+	<Field id="debugOptionsTitle" type="label" fontColor="darkGray" fontSize="small">
 		<Label>DEBUGGING OPTIONS</Label>
 	</Field>
 	<Field id="debugSeparator2" type="separator" />
