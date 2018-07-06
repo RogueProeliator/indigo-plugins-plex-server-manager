@@ -116,6 +116,9 @@ class RPFrameworkDevice(object):
 				self.hostPlugin.logger.info(u'Triggering property update due to missing device property: ' + RPFrameworkUtils.to_unicode(newPropertyDefn[0]))
 				pluginPropsCopy[newPropertyDefn[0]] = newPropertyDefn[1]
 				propertiesDictUpdateRequired = True
+				
+				# safeguard in case the device doesn't get updated...
+				self.indigoDevice.pluginProps[newPropertyDefn[0]] = newPropertyDefn[1]
 		if propertiesDictUpdateRequired == True:
 			self.indigoDevice.replacePluginPropsOnServer(pluginPropsCopy)
 	
@@ -254,4 +257,14 @@ class RPFrameworkDevice(object):
 	#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 	def reloadIndigoDevice(self):
 		self.indigoDevice = indigo.devices[self.indigoDevice.id]
+		
+	#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+	# This routine will update both the device's state list and the server with the new
+	# device states
+	#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+	def updateStatesForDevice(self, statesToUpdate):
+		for updateValue in statesToUpdate:
+			self.indigoDevice.states[updateValue["key"]] = updateValue["value"]
+		self.indigoDevice.updateStatesOnServer(statesToUpdate)
+	
 	

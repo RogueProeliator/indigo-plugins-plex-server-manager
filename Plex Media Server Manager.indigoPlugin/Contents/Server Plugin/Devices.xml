@@ -138,6 +138,11 @@
 				<TriggerLabel>Current User</TriggerLabel>
 				<ControlPageLabel>Current User</ControlPageLabel>
 			</State>
+			<State id="currentlyPlayingKey">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Currently Playing Media ID</TriggerLabel>
+				<ControlPageLabel>Currently Playing MediaID</ControlPageLabel>
+			</State>
 			<State id="currentlyPlayingTitle">
 				<ValueType>String</ValueType>
 				<TriggerLabel>Currently Playing Title</TriggerLabel>
@@ -158,6 +163,11 @@
 				<TriggerLabel>Currently Playing Thumbnail URL</TriggerLabel>
 				<ControlPageLabel>Currently Playing Thumbnail URL</ControlPageLabel>
 			</State>
+			<State id="currentlyPlayingParentKey">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Currently Playing Parent Media ID</TriggerLabel>
+				<ControlPageLabel>Currently Playing Parent Media ID</ControlPageLabel>
+			</State>
 			<State id="currentlyPlayingParentTitle">
 				<ValueType>String</ValueType>
 				<TriggerLabel>Currently Playing Parent Title</TriggerLabel>
@@ -167,6 +177,11 @@
 				<ValueType>String</ValueType>
 				<TriggerLabel>Currently Playing Parent Thumbnail URL</TriggerLabel>
 				<ControlPageLabel>Currently Playing Parent Thumbnail URL</ControlPageLabel>
+			</State>
+			<State id="currentlyPlayingGrandparentKey">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Currently Playing Grandparent Media ID</TriggerLabel>
+				<ControlPageLabel>Currently Playing Grandparent Media ID</ControlPageLabel>
 			</State>
 			<State id="currentlyPlayingGrandparentTitle">
 				<ValueType>String</ValueType>
@@ -253,6 +268,11 @@
 				<ValueType>Number</ValueType>
 				<TriggerLabel>Content Percent Complete</TriggerLabel>
 				<ControlPageLabel>Content Percent Complete</ControlPageLabel>
+			</State>
+			<State id="currentlyPlayingGenre">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Genre</TriggerLabel>
+				<ControlPageLabel>Genre</ControlPageLabel>
 			</State>
 			<State id="playerDeviceTitle">
 				<ValueType>String</ValueType>
@@ -297,6 +317,7 @@
 			<State id="clientConnectionStatus">
 				<ValueType>
 					<List>
+						<Option value="buffering">Buffering</Option>
 						<Option value="connected">Connected</Option>
 						<Option value="disconnected">Not Connected</Option>
 						<Option value="paused">Paused</Option>
@@ -328,6 +349,11 @@
 				<TriggerLabel>Current User</TriggerLabel>
 				<ControlPageLabel>Current User</ControlPageLabel>
 			</State>
+			<State id="currentlyPlayingKey">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Currently Playing Media ID</TriggerLabel>
+				<ControlPageLabel>Currently Playing MediaID</ControlPageLabel>
+			</State>
 			<State id="currentlyPlayingTitle">
 				<ValueType>String</ValueType>
 				<TriggerLabel>Currently Playing Title</TriggerLabel>
@@ -348,6 +374,11 @@
 				<TriggerLabel>Currently Playing Thumbnail URL</TriggerLabel>
 				<ControlPageLabel>Currently Playing Thumbnail URL</ControlPageLabel>
 			</State>
+			<State id="currentlyPlayingParentKey">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Currently Playing Parent Media ID</TriggerLabel>
+				<ControlPageLabel>Currently Playing Parent Media ID</ControlPageLabel>
+			</State>
 			<State id="currentlyPlayingParentTitle">
 				<ValueType>String</ValueType>
 				<TriggerLabel>Currently Playing Parent Title</TriggerLabel>
@@ -357,6 +388,11 @@
 				<ValueType>String</ValueType>
 				<TriggerLabel>Currently Playing Parent Thumbnail URL</TriggerLabel>
 				<ControlPageLabel>Currently Playing Parent Thumbnail URL</ControlPageLabel>
+			</State>
+			<State id="currentlyPlayingGrandparentKey">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Currently Playing Grandparent Media ID</TriggerLabel>
+				<ControlPageLabel>Currently Playing Grandparent Media ID</ControlPageLabel>
 			</State>
 			<State id="currentlyPlayingGrandparentTitle">
 				<ValueType>String</ValueType>
@@ -443,6 +479,11 @@
 				<ValueType>Number</ValueType>
 				<TriggerLabel>Content Percent Complete</TriggerLabel>
 				<ControlPageLabel>Content Percent Complete</ControlPageLabel>
+			</State>
+			<State id="currentlyPlayingGenre">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Genre</TriggerLabel>
+				<ControlPageLabel>Genre</ControlPageLabel>
 			</State>
 			<State id="playerDeviceTitle">
 				<ValueType>String</ValueType>

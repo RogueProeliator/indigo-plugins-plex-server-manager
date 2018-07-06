@@ -12,6 +12,7 @@
 #/////////////////////////////////////////////////////////////////////////////////////////
 import httplib
 import re
+import requests
 import time
 import urllib2
 import xml.etree.ElementTree
@@ -108,12 +109,15 @@ class PlexMediaContainerDirectory(object):
 		# we will keep a copy of the attributes of the dictionary as these are essentially
 		# "properties" of the object
 		self.dictionaryAttributes = dict()
+		self.genreList = []
 		
 		# the root container node will have a bunch of attributes which should be loaded into
 		# our attributes container
-		for key,value in dictionaryXmlNode.items():
-			self.dictionaryAttributes[key] = value
-
+		loadXmlElementToDictionary(dictionaryXmlNode, self.dictionaryAttributes)
+		
+		# there may be child Genre tracks...
+		for genreNode in dictionaryXmlNode.findall("Genre"):
+			self.genreList.append(genreNode.get("tag"))
 			
 
 #/////////////////////////////////////////////////////////////////////////////////////////
@@ -178,6 +182,7 @@ class PlexMediaContainerVideoSession(object):
 		self.userInfo = dict()
 		self.playerInfo = dict()
 		self.mediaInfo = dict()
+		self.genreList = []
 		
 		# the root Video node will have a bunch of attributes which should be loaded into
 		# our attributes container
@@ -199,7 +204,14 @@ class PlexMediaContainerVideoSession(object):
 		mediaXmlNode = videoXmlNode.find("Media")
 		if not mediaXmlNode is None:
 			loadXmlElementToDictionary(mediaXmlNode, self.mediaInfo)
-				
+			
+		if videoXmlNode.tag == u'Track':
+			# a separate call to the parent (album) must be made to get the genre list
+			pass
+		else:
+			# there may be multiple genre nodes associated with this media, list the name of each ("tag")
+			for genreNode in videoXmlNode.findall(u'Genre'):
+				self.genreList.append(genreNode.get(u'tag'))
 				
 				
 #/////////////////////////////////////////////////////////////////////////////////////////

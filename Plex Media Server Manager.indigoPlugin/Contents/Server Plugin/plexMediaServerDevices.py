@@ -176,13 +176,16 @@ class PlexMediaServer(RPFramework.RPFrameworkRESTfulDevice.RPFrameworkRESTfulDev
 						mediaTitle = grandparentTitle + mediaTitle
 					clientStatesToUpdate.append({ 'key' : u'currentlyPlayingTitle', 'value' : mediaTitle })
 					clientStatesToUpdate.append({ 'key' : u'currentlyPlayingSummary', 'value' : session.videoAttributes.get(u'summary', u'') })
+					clientStatesToUpdate.append({ 'key' : u'currentlyPlayingKey', 'value' : session.videoAttributes.get(u'key', u'') })
 					
 					clientStatesToUpdate.append({ 'key' : u'currentlyPlayingArtUrl', 'value' : session.videoAttributes.get(u'art', u'') })
 					clientStatesToUpdate.append({ 'key' : u'currentlyPlayingThumbnailUrl', 'value' : session.videoAttributes.get(u'thumb', u'') })
 					
+					clientStatesToUpdate.append({ 'key' : u'currentlyPlayingParentKey', 'value' : session.videoAttributes.get(u'parentKey', u'') })
 					clientStatesToUpdate.append({ 'key' : u'currentlyPlayingParentTitle', 'value' : session.videoAttributes.get(u'parentTitle', u'') })
 					clientStatesToUpdate.append({ 'key' : u'currentlyPlayingParentThumbnailUrl', 'value' : session.videoAttributes.get(u'parentThumb', u'') })
 					
+					clientStatesToUpdate.append({ 'key' : u'currentlyPlayingGrandparentKey', 'value' : session.videoAttributes.get(u'grandparentKey', u'') })
 					clientStatesToUpdate.append({ 'key' : u'currentlyPlayingGrandparentTitle', 'value' : session.videoAttributes.get(u'grandparentTitle', u'') })
 					clientStatesToUpdate.append({ 'key' : u'currentlyPlayingGrandparentArtUrl', 'value' : session.videoAttributes.get(u'grandparentArt', u'') })
 					clientStatesToUpdate.append({ 'key' : u'currentlyPlayingGrandparentThumbnailUrl', 'value' : session.videoAttributes.get(u'grandparentThumb', u'') })
@@ -205,9 +208,25 @@ class PlexMediaServer(RPFramework.RPFrameworkRESTfulDevice.RPFrameworkRESTfulDev
 						percentComplete = int(((1.0 * currentOffset) / (1.0 * contentDuration)) * 100.0)
 					clientStatesToUpdate.append({ 'key' : u'currentlyPlayingContentPercentComplete', 'value' : percentComplete, 'uiValue' : '{0:d}%'.format(percentComplete) })
 					
+					# genre is a list, update the state as a comma-delimited string
+					clientStatesToUpdate.append({ 'key' : u'currentlyPlayingGenre', 'value' : ",".join(session.genreList) })
+					if session.videoAttributes.get(u'type', u'unknown') == u'track' and session.videoAttributes.get(u'parentKey', u'') != '':
+						# this requires a separate call to load genre information from the parent
+						actionParams = indigo.Dict()
+						actionParams[u'deviceId'] = clientDevice.indigoDevice.id
+						actionParams[u'mediaKey'] = session.videoAttributes.get(u'parentKey', u'')
+						self.hostPlugin.executeAction(pluginAction=None, indigoActionId=u'getMediaMetadata', indigoDeviceId=int(self.indigoDevice.id), paramValues=actionParams)
+					elif session.videoAttributes.get(u'type', u'unknown') == u'episode' and session.videoAttributes.get(u'grandparentKey', u'') != '':
+						# this requires a separate call to load genre information from the grandparent
+						actionParams = indigo.Dict()
+						actionParams[u'deviceId'] = clientDevice.indigoDevice.id
+						actionParams[u'mediaKey'] = session.videoAttributes.get(u'grandparentKey', u'')
+						self.hostPlugin.executeAction(pluginAction=None, indigoActionId=u'getMediaMetadata', indigoDeviceId=int(self.indigoDevice.id), paramValues=actionParams)
+					
 					clientStatesToUpdate.append({ 'key' : u'playerDeviceTitle', 'value' : session.playerInfo.get(u'title', u'') })
 					
-					clientDevice.indigoDevice.updateStatesOnServer(clientStatesToUpdate)
+					# update the states on the Indigo server
+					clientDevice.updateStatesForDevice(clientStatesToUpdate)
 				else:
 					self.hostPlugin.logger.debug(u'Found unknown client: ' + playerMachineId)
 				
@@ -226,13 +245,16 @@ class PlexMediaServer(RPFramework.RPFrameworkRESTfulDevice.RPFrameworkRESTfulDev
 						clientStatesToUpdate.append({ 'key' : u'clientAddress', 'value' : u'' })
 						clientStatesToUpdate.append({ 'key' : u'clientPort', 'value' : 0 })
 						clientStatesToUpdate.append({ 'key' : u'currentUser', 'value' : u'' })
+						clientStatesToUpdate.append({ 'key' : u'currentlyPlayingKey', 'value' : u'' })
 						clientStatesToUpdate.append({ 'key' : u'currentlyPlayingMediaType', 'value' : u'unknown' })
+						clientStatesToUpdate.append({ 'key' : u'currentlyPlayingParentKey', 'value' : u'' })
 						clientStatesToUpdate.append({ 'key' : u'currentlyPlayingTitle', 'value' : u'' })
 						clientStatesToUpdate.append({ 'key' : u'currentlyPlayingSummary', 'value' : u'' })
 						clientStatesToUpdate.append({ 'key' : u'currentlyPlayingArtUrl', 'value' : u'' })
 						clientStatesToUpdate.append({ 'key' : u'currentlyPlayingThumbnailUrl', 'value' : u'' })
 						clientStatesToUpdate.append({ 'key' : u'currentlyPlayingParentTitle', 'value' : u''})
 						clientStatesToUpdate.append({ 'key' : u'currentlyPlayingParentThumbnailUrl', 'value' : u'' })
+						clientStatesToUpdate.append({ 'key' : u'currentlyPlayingGrandparentKey', 'value' : u'' })
 						clientStatesToUpdate.append({ 'key' : u'currentlyPlayingGrandparentTitle', 'value' : u'' })
 						clientStatesToUpdate.append({ 'key' : u'currentlyPlayingGrandparentArtUrl', 'value' : u'' })
 						clientStatesToUpdate.append({ 'key' : u'currentlyPlayingGrandparentThumbnailUrl', 'value' : u'' })
@@ -245,8 +267,9 @@ class PlexMediaServer(RPFramework.RPFrameworkRESTfulDevice.RPFrameworkRESTfulDev
 						clientStatesToUpdate.append({ 'key' : u'currentlyPlayingContentLengthOffset', 'value' : 0 })
 						clientStatesToUpdate.append({ 'key' : u'currentlyPlayingContentLengthOffsetDisplay', 'value' : u'' })
 						clientStatesToUpdate.append({ 'key' : u'currentlyPlayingContentPercentComplete', 'value' : 0 })
+						clientStatesToUpdate.append({ 'key' : u'currentlyPlayingGenre', 'value' : u'' })
 						clientStatesToUpdate.append({ 'key' : u'playerDeviceTitle', 'value' : u'' })
-						childDevice.indigoDevice.updateStatesOnServer(clientStatesToUpdate)
+						childDevice.updateStatesForDevice(clientStatesToUpdate)
 						
 				elif childDevice.indigoDevice.deviceTypeId == u'plexMediaClientSlot':
 					clientSlotNumStr = childDevice.indigoDevice.pluginProps.get('plexClientId', 'Slot 99')
@@ -261,13 +284,16 @@ class PlexMediaServer(RPFramework.RPFrameworkRESTfulDevice.RPFrameworkRESTfulDev
 						clientStatesToUpdate.append({ 'key' : u'clientPort', 'value' : 0 })
 						clientStatesToUpdate.append({ 'key' : u'clientId', 'value' : u'' })
 						clientStatesToUpdate.append({ 'key' : u'currentUser', 'value' : u'' })
+						clientStatesToUpdate.append({ 'key' : u'currentlyPlayingKey', 'value' : u'' })
 						clientStatesToUpdate.append({ 'key' : u'currentlyPlayingMediaType', 'value' : u'unknown' })
+						clientStatesToUpdate.append({ 'key' : u'currentlyPlayingParentKey', 'value' : u'' })
 						clientStatesToUpdate.append({ 'key' : u'currentlyPlayingTitle', 'value' : u'' })
 						clientStatesToUpdate.append({ 'key' : u'currentlyPlayingSummary', 'value' : u'' })
 						clientStatesToUpdate.append({ 'key' : u'currentlyPlayingArtUrl', 'value' : u'' })
 						clientStatesToUpdate.append({ 'key' : u'currentlyPlayingThumbnailUrl', 'value' : u'' })
 						clientStatesToUpdate.append({ 'key' : u'currentlyPlayingParentTitle', 'value' : u'' })
 						clientStatesToUpdate.append({ 'key' : u'currentlyPlayingParentThumbnailUrl', 'value' : u'' })
+						clientStatesToUpdate.append({ 'key' : u'currentlyPlayingGrandparentKey', 'value' : u'' })
 						clientStatesToUpdate.append({ 'key' : u'currentlyPlayingGrandparentTitle', 'value' : u'' })
 						clientStatesToUpdate.append({ 'key' : u'currentlyPlayingGrandparentArtUrl', 'value' : u'' })
 						clientStatesToUpdate.append({ 'key' : u'currentlyPlayingGrandparentThumbnailUrl', 'value' : u'' })
@@ -280,13 +306,37 @@ class PlexMediaServer(RPFramework.RPFrameworkRESTfulDevice.RPFrameworkRESTfulDev
 						clientStatesToUpdate.append({ 'key' : u'currentlyPlayingContentLengthOffset', 'value' : 0 })
 						clientStatesToUpdate.append({ 'key' : u'currentlyPlayingContentLengthOffsetDisplay', 'value' : u'' })
 						clientStatesToUpdate.append({ 'key' : u'currentlyPlayingContentPercentComplete', 'value' : 0 })
+						clientStatesToUpdate.append({ 'key' : u'currentlyPlayingGenre', 'value' : u'' })
 						clientStatesToUpdate.append({ 'key' : u'playerDeviceTitle', 'value' : u'' })
-						childDevice.indigoDevice.updateStatesOnServer(clientStatesToUpdate)
+						childDevice.updateStatesForDevice(clientStatesToUpdate)
 			
 			# update our list of currently connected clients
 			self.hostPlugin.logger.debug(u'Updating current client list to: ' + RPFramework.RPFrameworkUtils.to_unicode(newClientList))
 			self.currentClientList = newClientList
 			self.indigoDevice.updateStateOnServer(key=u'connectedClientCount', value=len(newClientList))
+			
+	#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+	# This routine will be called in order to handle a valid return from the PMS which
+	# is from a Metadata query (should be meta data from the requested media id)
+	#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+	def handlePlexMediaMetadataResult(self, responseObj, rpCommand):
+		plexContainer = plexMediaContainer.PlexMediaContainer(responseObj, rpCommand.getPayloadAsList()[1])
+		self.hostPlugin.logger.debug(u'Metadata MediaContainer Information: ' + RPFramework.RPFrameworkUtils.to_unicode(plexContainer.containerAttributes))
+		self.hostPlugin.logger.debug(u'Metadata MediaContainer Media Count: ' + RPFramework.RPFrameworkUtils.to_unicode(len(plexContainer.videoSessions)))
+		self.hostPlugin.logger.debug(u'Metadata MediaContainer Directories Count: ' + RPFramework.RPFrameworkUtils.to_unicode(len(plexContainer.directories)))
+		
+		# loop through each directory... 
+		for mediaDir in plexContainer.directories:			
+			# find any clients or slots that are playing this media and update the appropriate properties
+			dirMediaKey = mediaDir.dictionaryAttributes.get(u'key').replace("/children", "")
+			self.hostPlugin.logger.debug(u'Received metadata for media key ' + dirMediaKey)
+			for childDeviceId, childDevice in self.childDevices.iteritems():
+				if (childDevice.indigoDevice.states.get(u'currentlyPlayingMediaType', u'unknown') == u'track' and childDevice.indigoDevice.states.get(u'currentlyPlayingParentKey', u'') == dirMediaKey) or \
+					(childDevice.indigoDevice.states.get(u'currentlyPlayingMediaType', u'unknown') == u'episode' and childDevice.indigoDevice.states.get(u'currentlyPlayingGrandparentKey', u'') == dirMediaKey):
+					 childStatesToUpdate = []
+					 childStatesToUpdate.append({ 'key' : u'currentlyPlayingGenre', 'value' : ",".join(mediaDir.genreList) })
+					 childDevice.updateStatesForDevice(childStatesToUpdate)
+				
 			
 	#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 	# This routine should be overridden in individual device classes whenever they must
@@ -295,6 +345,22 @@ class PlexMediaServer(RPFramework.RPFrameworkRESTfulDevice.RPFrameworkRESTfulDev
 	def handleUnmanagedCommandInQueue(self, deviceHTTPAddress, rpCommand):
 		if rpCommand.commandName == u'obtainPlexSecurityToken':
 			self.retrieveSecurityToken()
+		elif rpCommand.commandName == u'updateDevices':
+			try:
+				# create the plex server object which will be used for all further access
+				deviceAddress = self.getRESTfulDeviceAddress()
+				plexUrl = self.indigoDevice.pluginProps.get(u'requestMethod', 'https') + u'://' + deviceAddress[0] + u':' + RPFramework.RPFrameworkUtils.to_unicode(deviceAddress[1])
+				plexServer = PlexServer(plexUrl, self.plexSecurityToken)
+				
+				# retrieve the list of sessions (currently playing media elements)
+				connectedStateUpdates = [
+					{'key' : u'connectionState', 'value' : u'Connected'},
+					{'key' : u'serverVersion', 'value' : plexServer.settings.get(u'version').value},
+					{'key' : u'transcoderActiveVideoSessions', 'value' : RPFramework.RPFrameworkUtils.to_unicode(plexServer.settings.get(u'transcoderActiveVideoSessions').value)}
+				]
+				self.indigoDevice.updateStatesOnServer(connectedStateUpdates)
+			except:
+				self.hostPlugin.logger.exception(u'Error processing server update')
 					
 	#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 	# This routine will be called prior to any network operation to allow the addition
@@ -410,8 +476,12 @@ class PlexMediaClient(RPFramework.RPFrameworkNonCommChildDevice.RPFrameworkNonCo
 		self.upgradedDeviceStates.append(u'currentlyPlayingContentLengthOffsetDisplay')
 		self.upgradedDeviceStates.append(u'currentlyPlayingParentTitle')
 		self.upgradedDeviceStates.append(u'currentlyPlayingGrandparentTitle')
+		self.upgradedDeviceStates.append(u'currentlyPlayingGenre')
 		self.upgradedDeviceStates.append(u'clientAddress')
 		self.upgradedDeviceStates.append(u'clientPort')
+		self.upgradedDeviceStates.append(u'currentlyPlayingParentKey')
+		self.upgradedDeviceStates.append(u'currentlyPlayingGrandparentKey')
+		self.upgradedDeviceStates.append(u'currentlyPlayingKey')
 		
 	#/////////////////////////////////////////////////////////////////////////////////////
 	# Utility methods
