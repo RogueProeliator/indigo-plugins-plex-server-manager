@@ -6,6 +6,9 @@ To update to the latest version of the application, please download the latest r
 =================================
 VERSION HISTORY
 =================================
+Version 2.2.0 [July 2018]:
+* Added genre information (state) for currently playing media
+
 Version 2.1.0 [June 2018]:
 * Removed the non-functioning update check functionality
 
