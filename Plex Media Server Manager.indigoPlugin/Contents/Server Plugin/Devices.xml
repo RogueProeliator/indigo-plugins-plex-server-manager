@@ -114,8 +114,10 @@
 						<Option value="buffering">Buffering</Option>
 						<Option value="connected">Connected</Option>
 						<Option value="disconnected">Not Connected</Option>
+						<Option value="stopped">Stopped</Option>
 						<Option value="paused">Paused</Option>
 						<Option value="playing">Playing</Option>
+						<Option value="other">Other</Option>
 					</List>
 				</ValueType>
 				<TriggerLabel>Connection Status Changed</TriggerLabel>
@@ -320,8 +322,10 @@
 						<Option value="buffering">Buffering</Option>
 						<Option value="connected">Connected</Option>
 						<Option value="disconnected">Not Connected</Option>
+						<Option value="stopped">Stopped</Option>
 						<Option value="paused">Paused</Option>
 						<Option value="playing">Playing</Option>
+						<Option value="other">Other</Option>
 					</List>
 				</ValueType>
 				<TriggerLabel>Connection Status Changed</TriggerLabel>
