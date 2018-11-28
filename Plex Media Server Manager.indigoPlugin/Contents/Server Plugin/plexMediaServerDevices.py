@@ -202,7 +202,7 @@ class PlexMediaServer(RPFramework.RPFrameworkRESTfulDevice.RPFrameworkRESTfulDev
 					clientStatesToUpdate.append({ 'key' : u'currentlyPlayingContentLengthDisplay', 'value' : str(datetime.timedelta(seconds=contentDuration/1000)) })
 					clientStatesToUpdate.append({ 'key' : u'currentlyPlayingContentLengthOffset', 'value' : currentOffset })
 					clientStatesToUpdate.append({ 'key' : u'currentlyPlayingContentLengthOffsetDisplay', 'value' : str(datetime.timedelta(seconds=currentOffset/1000)) })
-					if currentOffset == 0:
+					if currentOffset == 0 or contentDuration == 0:
 						percentComplete = 0
 					else:
 						percentComplete = int(((1.0 * currentOffset) / (1.0 * contentDuration)) * 100.0)

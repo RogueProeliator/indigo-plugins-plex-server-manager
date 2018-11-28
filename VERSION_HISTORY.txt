@@ -6,6 +6,13 @@ To update to the latest version of the application, please download the latest r
 =================================
 VERSION HISTORY
 =================================
+Version 2.3.3 [November 2018]:
+* Fixed issue causing error when streaming live TV on a Homerun style device
+
+Version 2.3.1 [November 2018]:
+* Added buffering and "other" state to client and slot devices Status
+* Added update check functionality against the Plugin Store version
+
 Version 2.2.0 [July 2018]:
 * Added genre information (state) for currently playing media
 
