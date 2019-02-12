@@ -12,7 +12,7 @@
 	</Field>
 	<Field id="updaterSeparator1" type="separator" />
     <Field type="label" id="updaterInstructions" fontSize="small">
-		<Label>This plugin may optionally email you to notify when updates are available; to do so, you must enable the notifications, enter an email address and ensure that email sending is configured in Indigo's preferences.</Label>
+		<Label>For Indigo v7.2 and earlier, this plugin may optionally email you to notify when updates are available; to do so, you must enable the notifications, enter an email address and ensure that email sending is configured in Indigo's preferences.</Label>
 	</Field>
 	<Field id="updaterEmailsEnabled" type="checkbox" defaultValue="true" fontSize="small">
 	   <Label>Enable Update Notifications:</Label>

@@ -86,6 +86,8 @@
 #		Removed XML file customization which was not working post-Beta 7
 #	Version 23 [October 2018]
 #		Added new version check against Plugin store
+#	Version 24 [February 2019]
+#		Modified version check to only execute against API 2.0 and below
 #
 #/////////////////////////////////////////////////////////////////////////////////////////
 #/////////////////////////////////////////////////////////////////////////////////////////
@@ -229,7 +231,12 @@ class RPFrameworkPlugin(indigo.PluginBase):
 		# create the command queue that will be used at the device level
 		self.pluginCommandQueue = Queue.Queue()
 		
-		# setup the plugin update checker... it will be disabled if the URL is empty
+		# setup the plugin update checker... it will be disabled if the URL is empty or the
+		# Indigo API is 2.1 or above as it will be built in... but it may be configured for
+		# and version
+		self.updateCheckPollEnabled = True
+		if float(indigo.server.apiVersion) > 2.05:
+			self.updateCheckPollEnabled = False
 		self.secondsBetweenUpdateChecks = 86400
 		self.nextUpdateCheck = time.time()
 		self.latestReleaseFound = ''
@@ -249,7 +256,6 @@ class RPFrameworkPlugin(indigo.PluginBase):
 		
 		# initialization is complete...
 		self.pluginIsInitializing = False
-	
 	
 	#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 	# This routine will parse the RPFrameworkConfig.xml file that is present in the
@@ -454,6 +460,7 @@ class RPFrameworkPlugin(indigo.PluginBase):
 		return rpParam
 	
 	
+	
 	#/////////////////////////////////////////////////////////////////////////////////////
 	# Indigo control methods
 	#/////////////////////////////////////////////////////////////////////////////////////
@@ -462,19 +469,15 @@ class RPFrameworkPlugin(indigo.PluginBase):
 	# of Indigo server or the plugin or an update
 	#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 	def startup(self):
-		# if the database is created, verify/create the tables now
-		dbConn = self.openDatabaseConnection()
-		if dbConn:
-			self.verifyAndCreateTables(dbConn)
-			self.closeDatabaseConnection(dbConn)
+		pass
 		
-	
 	#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 	# shutdown is called by Indigo whenever the entire plugin is being shut down from
 	# being disabled, during an update process or if the server is being shut down
 	#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 	def shutdown(self):
-		self.closeDatabaseConnection
+		pass
+		
 		
 		
 	#/////////////////////////////////////////////////////////////////////////////////////
@@ -596,6 +599,7 @@ class RPFrameworkPlugin(indigo.PluginBase):
 		return False
 		
 		
+	
 	#/////////////////////////////////////////////////////////////////////////////////////
 	# Asynchronous processing routines
 	#/////////////////////////////////////////////////////////////////////////////////////
@@ -674,7 +678,8 @@ class RPFrameworkPlugin(indigo.PluginBase):
 	def handleUnknownPluginCommand(self, rpCommand, reQueueCommandsList):
 		pass
 	
-		
+	
+	
 	#/////////////////////////////////////////////////////////////////////////////////////
 	# Indigo definitions helper functions
 	#/////////////////////////////////////////////////////////////////////////////////////
@@ -708,7 +713,7 @@ class RPFrameworkPlugin(indigo.PluginBase):
 		# obtain the current date/time and determine if it is after the previously-calculated
 		# next check run
 		timeNow = time.time()
-		if timeNow > self.nextUpdateCheck:
+		if self.updateCheckPollEnabled and timeNow > self.nextUpdateCheck:
 			self.checkVersionNow()
 			
 	#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -792,6 +797,7 @@ class RPFrameworkPlugin(indigo.PluginBase):
 			else:
 				self.logger.warning(u'Error checking for new plugin version.')
 				
+	
 	
 	#/////////////////////////////////////////////////////////////////////////////////////
 	# Data Validation functions... these functions allow the plugin or devices to validate
@@ -1023,6 +1029,7 @@ class RPFrameworkPlugin(indigo.PluginBase):
 		self.browserOpen(supportUrl)
 		
 		
+	
 	#/////////////////////////////////////////////////////////////////////////////////////
 	# Action execution routines... these allow automatic processing of actions that are
 	# known/managed/defined
@@ -1164,7 +1171,8 @@ class RPFrameworkPlugin(indigo.PluginBase):
 		
 		self.executeAction(None, indigoActionId, indigoDeviceId, paramValues)
 		
-		
+	
+	
 	#/////////////////////////////////////////////////////////////////////////////////////
 	# Helper routines
 	#/////////////////////////////////////////////////////////////////////////////////////
@@ -1340,69 +1348,4 @@ class RPFrameworkPlugin(indigo.PluginBase):
 	#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 	def performPluginUpgrade(self, oldVersion, newVersion):
 		pass
-		
-			
-	#/////////////////////////////////////////////////////////////////////////////////////
-	# Database access/helper methods
-	#/////////////////////////////////////////////////////////////////////////////////////
-	#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-	# This routine opens/creates the database connection... note that a failure to connect
-	# will NOT crash the plugin!
-	#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-	def openDatabaseConnection(self, guiConfigId=GUI_CONFIG_PLUGINSETTINGS):
-		dbConn = None
-		try:
-			# ensure that the database functionality has been enabled for the plugin
-			isDbEnabled = self.substituteIndigoValues(self.getGUIConfigValue(guiConfigId, GUI_CONFIG_DATABASE_CONN_ENABLED, u''), None, None)
-			self.logger.threaddebug(u'Database access enabled: ' + RPFrameworkUtils.to_unicode(isDbEnabled).lower())
-			if RPFrameworkUtils.to_unicode(isDbEnabled).lower() == 'true':
-				self.logger.threaddebug(u'Database access has been enabled, processing settings')
-			
-				# retrieve all of the possible settings required for the database
-				dbConnType = self.substituteIndigoValues(self.getGUIConfigValue(guiConfigId, GUI_CONFIG_DATABASE_CONN_TYPE, u'-1'), None, None)
-				dbConnDBName = self.substituteIndigoValues(self.getGUIConfigValue(guiConfigId, GUI_CONFIG_DATABASE_CONN_DBNAME, u''), None, None)
-				self.logger.threaddebug(u'Database settings: \nType: ' + dbConnType + u'\nName: ' + dbConnDBName)
-			
-				# determine if we can connect to the database with the given information
-				dbTypeInt = int(dbConnType)
-				if dbTypeInt == indigosql.kDbType_sqlite:
-					# only the name is required for a SQLLite database connection
-					if dbConnDBName == u'':
-						self.logger.error(u'A database path/name must be specified for a SQLLite database connection')
-					else:
-						# should be good to attempt a database connection...
-						debugLogFunc = None
-						if self.debugLevel > DEBUGLEVEL_NONE:
-							debugLogFunc = self.debugLog
-						dbConn = indigosql.IndigoSqlite(dbConnDBName, self.sleep, indigo.server.log, debugLogFunc)
-						self.logger.debug(u'SQLLite connection established')
-				else:
-					self.logger.error(u'Unsupported database type selected')
-					
-			else:
-				self.logger.threaddebug(u'Database access has been disabled, skipping connection')
-			
-			return dbConn
-		except:
-			self.logger.error(u'Error establishing database connection')
-			
-	#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-	# This routine will be called in order to create the tables for the plugin... each
-	# plugin should override this routine as needed
-	#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-	def verifyAndCreateTables(self, dbConn):
-		pass
-			
-	#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-	# This routine will disconnect from the database, if it is currently connected
-	#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-	def closeDatabaseConnection(self, dbConn):
-		try:
-			if dbConn:
-				self.logger.debug(u'Closing database connection')
-				dbConn.CloseSqlConnection()
-				dbConn = None
-		except:
-			# do not re-raise the exception
-			pass
 		
