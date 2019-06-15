@@ -48,11 +48,22 @@
 				<Label/>
 			</Field>
 		</ConfigUI>
+		<UiDisplayStateId>connectionState</UiDisplayStateId>
 		<States>
 			<State id="connectionState">
 				<ValueType>String</ValueType>
 				<TriggerLabel>Connection State</TriggerLabel>
 				<ControlPageLabel>Connection State</ControlPageLabel>
+			</State>
+			<State id="serverIdentifier">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Server Id</TriggerLabel>
+				<ControlPageLabel>Server Id</ControlPageLabel>
+			</State>
+			<State id="serverName">
+				<ValueType>String</ValueType>
+				<TriggerLabel>Server Name</TriggerLabel>
+				<ControlPageLabel>Server Name</ControlPageLabel>
 			</State>
 			<State id="serverVersion">
 				<ValueType>String</ValueType>

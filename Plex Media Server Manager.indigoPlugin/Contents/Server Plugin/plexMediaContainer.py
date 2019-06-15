@@ -88,6 +88,8 @@ class PlexMediaContainer(object):
 				self.videoSessions.append(PlexMediaContainerVideoSession(video))
 			for audio in mediaContainerNode.findall(u'Track'):
 				self.videoSessions.append(PlexMediaContainerVideoSession(audio))
+				
+		mediaContainerNode.clear()
 		
 		
 #/////////////////////////////////////////////////////////////////////////////////////////

@@ -7,6 +7,7 @@ To update to the latest version of the application, please download the latest r
 VERSION HISTORY
 =================================
 Version 2.3.5 [February 2019]:
+* Added additional state information to Plex Media Server device type
 * Preparation for Indigo v7.3 changes
 
 Version 2.3.3 [November 2018]:

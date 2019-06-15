@@ -67,6 +67,9 @@ class PlexMediaServer(RPFramework.RPFrameworkRESTfulDevice.RPFrameworkRESTfulDev
 		self.upgradedDeviceProperties.append((u'plexUsername', u'')) 
 		self.upgradedDeviceProperties.append((u'plexPassword', u'')) 
 		
+		self.upgradedDeviceStates.append(u'serverIdentifier')
+		self.upgradedDeviceStates.append(u'serverName')
+		
 		
 	#/////////////////////////////////////////////////////////////////////////////////////
 	# RESTful device overloads
@@ -97,6 +100,8 @@ class PlexMediaServer(RPFramework.RPFrameworkRESTfulDevice.RPFrameworkRESTfulDev
 		if plexContainer.containerType == plexMediaContainer.MEDIACONTAINERTYPE_SERVERNODE:
 			connectedStateUpdates = [
 				{'key' : u'connectionState', 'value' : u'Connected'},
+				{'key' : u'serverIdentifier', 'value' : plexContainer.containerAttributes["machineIdentifier"]},
+				{'key' : u'serverName', 'value' : plexContainer.containerAttributes["friendlyName"]},
 				{'key' : u'serverVersion', 'value' : plexContainer.containerAttributes["version"]},
 				{'key' : u'transcoderActiveVideoSessions', 'value' : plexContainer.containerAttributes["transcoderActiveVideoSessions"]}
 			]
