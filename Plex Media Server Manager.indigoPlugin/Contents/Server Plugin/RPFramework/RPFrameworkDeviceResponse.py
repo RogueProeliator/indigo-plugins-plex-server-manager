@@ -14,17 +14,6 @@
 # 	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # 	SOFTWARE.	
 #
-#	Version 0:
-#		Initial release of the device framework
-#	Version 6:
-#		Added error catching surrounding effect execution; now outputs to log instead of
-#			crashing on error
-#	Version 17:
-#		Added unicode support
-#		Change exception logging to new plugin-object based error logging
-#	Version 18:
-#		Added support for updateExecCondition specification on response processing effects
-#
 #/////////////////////////////////////////////////////////////////////////////////////////
 #/////////////////////////////////////////////////////////////////////////////////////////
 
@@ -38,6 +27,7 @@ import re
 import RPFrameworkCommand
 import RPFrameworkPlugin
 import RPFrameworkUtils
+import RPFrameworkIndigoAction
 
 #/////////////////////////////////////////////////////////////////////////////////////////
 # Constants and configuration variables
@@ -65,11 +55,11 @@ class RPFrameworkDeviceResponse(object):
 	# Constructor allows passing in the data that makes up the response object
 	#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 	def __init__(self, responseId, criteriaFormatString, matchExpression, respondToActionId=u''):
-		self.responseId = responseId
+		self.responseId           = responseId
 		self.criteriaFormatString = criteriaFormatString
-		self.respondToActionId = respondToActionId
-		self.matchExpression = matchExpression
-		self.matchResultEffects = list()
+		self.respondToActionId    = respondToActionId
+		self.matchExpression      = matchExpression
+		self.matchResultEffects   = list()
 		
 	
 	#/////////////////////////////////////////////////////////////////////////////////////
@@ -92,13 +82,15 @@ class RPFrameworkDeviceResponse(object):
 	def isResponseMatch(self, responseObj, rpCommand, rpDevice, rpPlugin):
 		if self.criteriaFormatString is None or self.criteriaFormatString == u'' or self.matchExpression is None or self.matchExpression == u'':
 			# we only need to look at the action...
-			if self.respondToActionId == u'' or self.respondToActionId == rpCommand.parentAction.indigoActionId:
+			if self.respondToActionId == u'' or rpCommand.parentAction is None:
 				return True
+			elif isinstance(rpCommand.parentAction, basestring):
+				return self.respondToActionId == rpCommand.parentAction
 			else:
-				return False
+				return self.respondToActionId == rpCommand.parentAction.indigoActionId
 				
 		matchCriteriaTest = self.substituteCriteriaFormatString(self.criteriaFormatString, responseObj, rpCommand, rpDevice, rpPlugin)
-		matchObj = re.match(self.matchExpression, matchCriteriaTest, re.I)
+		matchObj          = re.match(self.matchExpression, matchCriteriaTest, re.I)
 		return (matchObj is not None) and (self.respondToActionId == u'' or self.respondToActionId == rpCommand.parentAction.indigoActionId)
 	
 	#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -136,7 +128,7 @@ class RPFrameworkDeviceResponse(object):
 			if effect.updateExecCondition != None and effect.updateExecCondition != u'':
 				# this should eval to a boolean value
 				if eval(rpPlugin.substituteIndigoValues(effect.updateExecCondition, rpDevice, dict())) == False:
-					rpPlugin.logger.threaddebug(u'Execute condition failed for response, skipping execution for effect: ' + effect.effectType)
+					rpPlugin.logger.threaddebug(u'Execute condition failed for response, skipping execution for effect: {0}'.format(effect.effectType))
 					continue
 		
 			# processing for this effect is dependent upon the type
@@ -161,10 +153,10 @@ class RPFrameworkDeviceResponse(object):
 				
 					# update the state...
 					if newStateUIValue == u'':
-						rpPlugin.logger.debug(u'Effect execution: Update state "' + effect.updateParam + u'" to "' + RPFrameworkUtils.to_unicode(newStateValue) + u'"')
+						rpPlugin.logger.debug(u'Effect execution: Update state "{0}" to "{1}"'.format(effect.updateParam, newStateValue))
 						rpDevice.indigoDevice.updateStateOnServer(key=effect.updateParam, value=newStateValue)
 					else:
-						rpPlugin.logger.debug(u'Effect execution: Update state "' + effect.updateParam + '" to "' + RPFrameworkUtils.to_unicode(newStateValue) + u'" with UIValue "' + RPFrameworkUtils.to_unicode(newStateUIValue) + u'"')
+						rpPlugin.logger.debug(u'Effect execution: Update state "{0}" to "{1}" with UIValue "{2}"'.format(effect.updateParam, newStateValue, newStateUIValue))
 						rpDevice.indigoDevice.updateStateOnServer(key=effect.updateParam, value=newStateValue, uiValue=newStateUIValue)
 				
 				elif effect.effectType == RESPONSE_EFFECT_QUEUECOMMAND:
@@ -178,15 +170,15 @@ class RPFrameworkDeviceResponse(object):
 					else:
 						queueCommandPayload = queueCommandPayloadStr
 				
-					rpPlugin.logger.debug(u'Effect execution: Queuing command {' + queueCommandName + u'}')
+					rpPlugin.logger.debug(u'Effect execution: Queuing command {0}'.format(queueCommandName))
 					rpDevice.queueDeviceCommand(RPFrameworkCommand.RPFrameworkCommand(queueCommandName, queueCommandPayload))
 				
 				elif effect.effectType == RESPONSE_EFFECT_CALLBACK:
 					# this should kick off a callback to a python call on the device...
-					rpPlugin.logger.debug(u'Effect execution: Calling function ' + effect.updateParam)
+					rpPlugin.logger.debug(u'Effect execution: Calling function {0}'.format(effect.updateParam))
 					eval(u'rpDevice.' + effect.updateParam + u'(responseObj, rpCommand)')
 			except:
-				rpPlugin.logger.exception(u'Error executing effect for device id ' + RPFrameworkUtils.to_unicode(rpDevice.indigoDevice.id))
+				rpPlugin.logger.exception(u'Error executing effect for device id {0}'.format(rpDevice.indigoDevice.id))
 				
 	
 #/////////////////////////////////////////////////////////////////////////////////////////
@@ -207,11 +199,11 @@ class RPFrameworkDeviceResponseEffect(object):
 	# Constructor allows passing in the data that makes up the response object
 	#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 	def __init__(self, effectType, updateParam, updateValueFormatString=u'', updateValueFormatExString=u'', evalUpdateValue=False, updateExecCondition=None):
-		self.effectType = effectType
-		self.updateParam = updateParam
-		self.updateValueFormatString = updateValueFormatString
+		self.effectType                = effectType
+		self.updateParam               = updateParam
+		self.updateValueFormatString   = updateValueFormatString
 		self.updateValueFormatExString = updateValueFormatExString
-		self.evalUpdateValue = evalUpdateValue
-		self.updateExecCondition = updateExecCondition
+		self.evalUpdateValue           = evalUpdateValue
+		self.updateExecCondition       = updateExecCondition
 		
 		

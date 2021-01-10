@@ -5,27 +5,32 @@
 	<Device type="custom" id="plexMediaServer">
 		<Name>Plex Media Server</Name>
 		<ConfigUI>
-			<Field id="commOptionsTitle" type="label" fontColor="darkGray" fontSize="small">
+			<Field id="commOptionsTitle" type="label" fontColor="darkGray">
 				<Label>CONNECTION OPTIONS</Label>
 			</Field>
 			<Field id="instructionSeparator1" type="separator" />
-			<Field id="deviceSelectionInstructions" type="label" fontSize="small">
+			<Field id="loginType" type="checkbox">
+				<Label>Use My Plex Login (PlexPass)</Label>
+			</Field>
+
+			<!-- server connection information for local authentication -->
+			<Field id="deviceSelectionInstructions" type="label" fontSize="small" visibleBindingId="loginType" visibleBindingValue="false">
 				<Label>Please enter the IP address (or hostname) and the port for the server.</Label>
 			</Field>
-			<Field id="requestMethod" type="menu">
+			<Field id="requestMethod" type="menu" visibleBindingId="loginType" visibleBindingValue="false">
 				<Label>Method:</Label>
 				<List>
 					<Option value="http">Standard - http</Option>
 					<Option value="https">Secure - https</Option>
 				</List>
 			</Field>
-			<Field id="httpAddress" type="textfield">
+			<Field id="httpAddress" type="textfield" visibleBindingId="loginType" visibleBindingValue="false">
 				<Label>Hostname or IP Address:</Label>	
 			</Field>
-			<Field id="httpPort" type="textfield" defaultValue="32400">
+			<Field id="httpPort" type="textfield" defaultValue="32400" visibleBindingId="loginType" visibleBindingValue="false">
 				<Label>Port:</Label>
 			</Field>
-			<Field id="loginRequired" type="checkbox" defaultValue="false">
+			<Field id="loginRequired" type="checkbox" defaultValue="false" visibleBindingId="loginType" visibleBindingValue="false">
 				<Label>Login Required:</Label>
 				<Description>Check if your server requires authentication</Description>
 			</Field>
@@ -35,6 +40,20 @@
 			<Field id="plexPassword" type="textfield" enabledBindingId="loginRequired">
 				<Label>Password:</Label>	
 			</Field>
+
+			<!-- server connection information for My Plex (PlexPass) authentication -->
+			<Field id="myPlexUsername" type="textfield" visibleBindingId="loginType" visibleBindingValue="true">
+				<Label>Username:</Label>	
+			</Field>
+			<Field id="myPlexPassword" type="textfield" visibleBindingId="loginType" visibleBindingValue="true">
+				<Label>Password:</Label>	
+			</Field>
+
+
+			<Field id="commOptionsTitle" type="label" fontColor="darkGray">
+				<Label>PERFORMANCE OPTIONS</Label>
+			</Field>
+			<Field id="perfOptionsSep" type="separator" />
 			<Field id="pollInterval" type="menu" defaultValue="20">
 				<Label>Poll Interval:</Label>
 				<List>
@@ -44,6 +63,7 @@
 					<Option value="60">Long (60s)</Option>
 				</List>
 			</Field>
+
 			<Field id="address" type="textfield" hidden='true' >
 				<Label/>
 			</Field>

@@ -1,29 +1,27 @@
 <?xml version="1.0"?>
 <PluginConfig>	
-	<Field id="pluginTitleLabel" type="label" fontSize="large">
+	<Field id="pluginTitleLabel" type="label">
         <Label>Plex Media Server Manager</Label>
     </Field>
     <Field id="pluginAuthorLabel" type="label" fontSize="small">
         <Label>Developed by RogueProeliator</Label>
     </Field>
-    <Field id="headerSpacer" type="label" fontSize="mini"/>
-    <Field id="updaterOptionsTitle" type="label" fontColor="darkGray" fontSize="small">
-		<Label>UPDATE NOTIFICATION OPTIONS</Label>
+
+    <Field type="label" id="aboutSpacer" fontSize="small">
+		<Label></Label>
 	</Field>
-	<Field id="updaterSeparator1" type="separator" />
-    <Field type="label" id="updaterInstructions" fontSize="small">
-		<Label>For Indigo v7.2 and earlier, this plugin may optionally email you to notify when updates are available; to do so, you must enable the notifications, enter an email address and ensure that email sending is configured in Indigo's preferences.</Label>
+	<Field id="aboutTitle" type="label" fontColor="darkGray">
+		<Label>ABOUT</Label>
 	</Field>
-	<Field id="updaterEmailsEnabled" type="checkbox" defaultValue="true" fontSize="small">
-	   <Label>Enable Update Notifications:</Label>
+	<Field id="aboutSeparator" type="separator" />
+	<Field id="pluginDescriptionLabel" type="label" fontSize="small">
+		<Label>This plugin allows monitoring a Plex Media Server and its connected clients.</Label>
 	</Field>
-	<Field id="updaterEmail" type="textfield">
-	   <Label>Notifications Email:</Label>
-	</Field>
+
 	<Field type="label" id="debugSpacer" fontSize="small">
 		<Label></Label>
 	</Field>
-	<Field id="debugOptionsTitle" type="label" fontColor="darkGray" fontSize="small">
+	<Field id="debugOptionsTitle" type="label" fontColor="darkGray">
 		<Label>DEBUGGING OPTIONS</Label>
 	</Field>
 	<Field id="debugSeparator2" type="separator" />

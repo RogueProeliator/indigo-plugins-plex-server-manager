@@ -14,11 +14,6 @@
 # 	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # 	SOFTWARE.
 #
-#	Version 0:
-#		Initial release of the plugin framework
-#	Version 17:
-#		Added unicode support / proper string conversions
-#
 #/////////////////////////////////////////////////////////////////////////////////////////
 #/////////////////////////////////////////////////////////////////////////////////////////
 
@@ -51,10 +46,10 @@ class SSDPResponse(object):
 		r.begin()
 		
 		self.location = u''
-		self.usn = u''
-		self.st = u''
-		self.server = u''
-		self.cache = u''
+		self.usn      = u''
+		self.st       = u''
+		self.server   = u''
+		self.cache    = u''
 		
 		if r.getheader("location") is not None:
 			self.location = RPFrameworkUtils.to_unicode(r.getheader("location"))

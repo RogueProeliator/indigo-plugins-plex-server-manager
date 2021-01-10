@@ -15,17 +15,6 @@
 # 	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # 	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # 	SOFTWARE.
-#	
-#
-#	Version 0:
-#		Initial release of the plugin framework
-#	Version 8:
-#		Added the list parameter type
-#	Version 15:
-#		Added the ParamTypeOSFilePath parameter type
-#	Version 17:
-#		Added unicode support
-#		Fixed issue on line 119 for boolean params
 #
 #/////////////////////////////////////////////////////////////////////////////////////////
 #/////////////////////////////////////////////////////////////////////////////////////////
@@ -45,14 +34,14 @@ import RPFrameworkUtils
 #/////////////////////////////////////////////////////////////////////////////////////////
 # Constants and configuration variables
 #/////////////////////////////////////////////////////////////////////////////////////////
-ParamTypeInteger = 0
-ParamTypeFloat = 1
-ParamTypeBoolean = 2
-ParamTypeString = 3
+ParamTypeInteger         = 0
+ParamTypeFloat           = 1
+ParamTypeBoolean         = 2
+ParamTypeString          = 3
 ParamTypeOSDirectoryPath = 4
-ParamTypeIPAddress = 5
-ParamTypeList = 6
-ParamTypeOSFilePath = 7
+ParamTypeIPAddress       = 5
+ParamTypeList            = 6
+ParamTypeOSFilePath      = 7
 
 #/////////////////////////////////////////////////////////////////////////////////////////
 #/////////////////////////////////////////////////////////////////////////////////////////
@@ -73,14 +62,14 @@ class RPFrameworkIndigoParamDefn(object):
 	# (with the type and ID being the only two required fields
 	#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 	def __init__(self, indigoId, paramType, isRequired=False, defaultValue="", minValue=0, maxValue=sys.maxint, validationExpression=u'', invalidValueMessage=u''):
-		self.indigoId = indigoId
-		self.paramType = paramType
-		self.isRequired = isRequired
-		self.defaultValue = defaultValue
-		self.minValue = minValue
-		self.maxValue = maxValue
+		self.indigoId             = indigoId
+		self.paramType            = paramType
+		self.isRequired           = isRequired
+		self.defaultValue         = defaultValue
+		self.minValue             = minValue
+		self.maxValue             = maxValue
 		self.validationExpression = validationExpression
-		self.invalidValueMessage = invalidValueMessage
+		self.invalidValueMessage  = invalidValueMessage
 		
 	#/////////////////////////////////////////////////////////////////////////////////////
 	# Validation methods

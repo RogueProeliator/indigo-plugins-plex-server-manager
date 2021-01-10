@@ -29,18 +29,18 @@
 # Constants and configuration variables
 #/////////////////////////////////////////////////////////////////////////////////////////
 # standard command names common to many plugins
-CMD_INITIALIZE_CONNECTION = u'INITIALIZECONNECTION'
+CMD_INITIALIZE_CONNECTION       = u'INITIALIZECONNECTION'
 CMD_TERMINATE_PROCESSING_THREAD = u'TERMINATEPROCESSING'
-CMD_PAUSE_PROCESSING = u'PAUSEPROCESSING'
-CMD_DOWNLOAD_UPDATE = u'DOWNLOADUPDATE'
+CMD_PAUSE_PROCESSING            = u'PAUSEPROCESSING'
+CMD_DOWNLOAD_UPDATE             = u'DOWNLOADUPDATE'
 
-CMD_UPDATE_DEVICE_STATUS_FULL = u'UPDATEDEVICESTATUS_FULL'
-CMD_UPDATE_DEVICE_STATE = u'UPDATEDEVICESTATE'
+CMD_UPDATE_DEVICE_STATUS_FULL   = u'UPDATEDEVICESTATUS_FULL'
+CMD_UPDATE_DEVICE_STATE         = u'UPDATEDEVICESTATE'
 
-CMD_NETWORKING_WOL_REQUEST = u'SENDWOLREQUEST'
-CMD_DEVICE_RECONNECT = u'RECONNECTDEVICE'
+CMD_NETWORKING_WOL_REQUEST      = u'SENDWOLREQUEST'
+CMD_DEVICE_RECONNECT            = u'RECONNECTDEVICE'
 
-CMD_DEBUG_LOGUPNPDEVICES = u'LOGUPNPDEVICES'
+CMD_DEBUG_LOGUPNPDEVICES        = u'LOGUPNPDEVICES'
 
 
 #/////////////////////////////////////////////////////////////////////////////////////////
@@ -61,10 +61,10 @@ class RPFrameworkCommand(object):
 	# Constructor allows passing in the data that makes up the command
 	#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 	def __init__(self, commandName, commandPayload=None, postCommandPause=0.0, parentAction=u''):
-		self.commandName = commandName
-		self.commandPayload = commandPayload
+		self.commandName      = commandName
+		self.commandPayload   = commandPayload
 		self.postCommandPause = postCommandPause
-		self.parentAction = parentAction
+		self.parentAction     = parentAction
 		
 		
 	#/////////////////////////////////////////////////////////////////////////////////////

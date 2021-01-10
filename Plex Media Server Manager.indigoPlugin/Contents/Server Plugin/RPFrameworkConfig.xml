@@ -47,29 +47,7 @@
 					<updateStatusPollerIntervalProperty>pollInterval</updateStatusPollerIntervalProperty>
 					<updateStatusPollerActionId>updateServerStatusFull</updateStatusPollerActionId>
 					<childDeviceDictionaryKeyFormat><![CDATA[%dp:plexClientId%]]></childDeviceDictionaryKeyFormat>
-				</guiConfiguration>
-				<deviceResponses>
-					<response id="plexMediaResponse" respondToActionId="updateServerStatusFull">
-						<criteriaFormatString></criteriaFormatString>
-						<matchExpression></matchExpression>
-						<effects>
-							<effect effectType="RESPONSE_EFFECT_CALLBACK" evalResult="False">
-								<updateParam>handlePlexMediaContainerResult</updateParam>
-								<updateValueFormat></updateValueFormat>
-							</effect>
-						</effects>
-					</response>
-					<response id="plexMetadataResponse" respondToActionId="getMediaMetadata">
-						<criteriaFormatString></criteriaFormatString>
-						<matchExpression></matchExpression>
-						<effects>
-							<effect effectType="RESPONSE_EFFECT_CALLBACK" evalResult="False">
-								<updateParam>handlePlexMediaMetadataResult</updateParam>
-								<updateValueFormat></updateValueFormat>
-							</effect>
-						</effects>
-					</response>
-				</deviceResponses>	
+				</guiConfiguration>	
 			</device>
 			<device indigoId="plexMediaClient">
 				<params>
@@ -106,21 +84,8 @@
 			<action indigoId="updateServerStatusFull">
 				<commands>
 					<command>
-						<commandName>obtainPlexSecurityToken</commandName>
+						<commandName>updateServerStatusFull</commandName>
 						<commandFormat></commandFormat>
-						<commandExecCondition><![CDATA[unicode('%dp:loginRequired%').lower() == u'true']]></commandExecCondition>
-					</command>
-					<command>
-						<commandName>RESTFUL_GET</commandName>
-						<commandFormat>%dp:requestMethod%|*|/|*|basic|*|%dp:plexUsername%|*|%dp:plexPassword%</commandFormat>
-					</command>
-					<command>
-						<commandName>RESTFUL_GET</commandName>
-						<commandFormat>%dp:requestMethod%|*|/status/sessions|*|basic|*|%dp:plexUsername%|*|%dp:plexPassword%</commandFormat>
-					</command>
-					<command>
-						<commandName>RESTFUL_GET</commandName>
-						<commandFormat>%dp:requestMethod%|*|/clients|*|basic|*|%dp:plexUsername%|*|%dp:plexPassword%</commandFormat>
 					</command>
 				</commands>
 			</action>

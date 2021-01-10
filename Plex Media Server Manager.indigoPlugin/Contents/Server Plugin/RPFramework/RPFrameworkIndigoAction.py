@@ -15,15 +15,6 @@
 # 	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # 	SOFTWARE.	
 #
-#	Version 0:
-#		Initial release of the plugin framework
-#	Version 4:
-#		Added support for the executeCondition parameter on the commands to execute
-#	Version 16:
-#		Fixed typo which causes an error when validation fails for an action
-#	Version 17:
-#		Added unicode support
-#
 #/////////////////////////////////////////////////////////////////////////////////////////
 #/////////////////////////////////////////////////////////////////////////////////////////
 
@@ -128,7 +119,7 @@ class RPFrameworkIndigoActionDfn(object):
 		# validate that the values sent in are valid for this action
 		validationResults = self.validateActionValues(paramValues)
 		if validationResults[0] == False:
-			rpPlugin.logger.error(u'Invalid values sent for action ' + RPFrameworkUtils.to_unicode(self.indigoActionId) + u'; the following errors were found:')
+			rpPlugin.logger.error(u'Invalid values sent for action {0}; the following errors were found:'.format(self.indigoActionId))
 			rpPlugin.logger.error(RPFrameworkUtils.to_unicode(validationResults[2]))
 			return
 		
@@ -146,7 +137,7 @@ class RPFrameworkIndigoActionDfn(object):
 			if executeCondition != None and executeCondition != u'':
 				# this should eval to a boolean value
 				if eval(rpPlugin.substituteIndigoValues(executeCondition, rpDevice, resolvedValues)) == False:
-					rpPlugin.logger.threaddebug(u'Execute condition failed, skipping execution for command: ' + commandName)
+					rpPlugin.logger.threaddebug(u'Execute condition failed, skipping execution for command: {0}'.format(commandName))
 					continue
 		
 			# determine the number of times to execute this command (supports sending the same request
