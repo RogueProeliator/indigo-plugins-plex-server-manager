@@ -1,0 +1,3 @@
+[submodule "src/Plex Media Server Manager.indigoPlugin/Contents/Server Plugin/RPFramework"]
+	path = src/Plex Media Server Manager.indigoPlugin/Contents/Server Plugin/RPFramework
+	url = https://github.com/RogueProeliator/indigo-plugins-rpframework-src
