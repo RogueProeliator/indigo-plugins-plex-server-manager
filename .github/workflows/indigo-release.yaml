@@ -1,0 +1,33 @@
+# Manually triggered workflow for creating an Indigo deployment release
+name: Release for Indigo
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_num:
+        description: 'Version Number'
+        default: ''
+        required: true
+      is_prerelease:
+        description: 'Pre-Release?'
+        default: false
+        required: true
+
+jobs:
+  createrelease:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+      with:
+        submodules: recursive
+    - uses: montudor/action-zip@v1
+      with:
+        args: zip -qq -r "Plex Media Server Manager.indigoPlugin.zip" "src/Plex Media Server Manager.indigoPlugin"
+
+    - uses: ncipollo/release-action@v1
+      with:
+        tag: ${{ github.event.inputs.release_num }}
+        artifacts: "Plex Media Server Manager.indigoPlugin.zip"
+        body: "Release"
+        prerelease: ${{ github.event.inputs.is_prerelease }}
