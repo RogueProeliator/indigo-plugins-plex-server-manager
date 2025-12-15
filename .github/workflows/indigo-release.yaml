@@ -32,6 +32,6 @@ jobs:
     - uses: ncipollo/release-action@v1
       with:
         tag: ${{ github.event.inputs.release_num }}
-        artifacts: "src/Dayton Audio Controller.indigoPlugin.zip"
+        artifacts: "src/Plex Media Server Manager.indigoPlugin.zip"
         body: "Release"
         prerelease: ${{ github.event.inputs.is_prerelease }}
