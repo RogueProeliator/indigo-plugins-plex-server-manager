@@ -21,13 +21,17 @@ jobs:
     - uses: actions/checkout@v1
       with:
         submodules: recursive
-    - uses: montudor/action-zip@v1
-      with:
-        args: zip -qq -r "Plex Media Server Manager.indigoPlugin.zip" "src/Plex Media Server Manager.indigoPlugin"
+
+    - name: Install Zip Archiver
+      uses: montudor/action-zip@v1
+
+    - name: Zip Plugin Artifact
+      run: zip -qq -r "Plex Media Server Manager.indigoPlugin.zip "Plex Media Server Manager.indigoPlugin"
+      working-directory: src
 
     - uses: ncipollo/release-action@v1
       with:
         tag: ${{ github.event.inputs.release_num }}
-        artifacts: "Plex Media Server Manager.indigoPlugin.zip"
+        artifacts: "src/Dayton Audio Controller.indigoPlugin.zip"
         body: "Release"
         prerelease: ${{ github.event.inputs.is_prerelease }}
