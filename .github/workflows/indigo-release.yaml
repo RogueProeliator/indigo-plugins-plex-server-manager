@@ -26,7 +26,7 @@ jobs:
       uses: montudor/action-zip@v1
 
     - name: Zip Plugin Artifact
-      run: zip -qq -r "Plex Media Server Manager.indigoPlugin.zip "Plex Media Server Manager.indigoPlugin"
+      run: zip -qq -r "Plex Media Server Manager.indigoPlugin.zip" "Plex Media Server Manager.indigoPlugin"
       working-directory: src
 
     - uses: ncipollo/release-action@v1
