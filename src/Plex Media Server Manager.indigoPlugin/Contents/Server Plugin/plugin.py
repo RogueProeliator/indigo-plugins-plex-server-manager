@@ -74,9 +74,7 @@ class Plugin(indigo.PluginBase):
             logging.Formatter(fmt=LOG_FORMAT, datefmt='%Y-%m-%d %H:%M:%S')
         )
         # Set level on both the logger and handler
-        self.logger.setLevel(logging.DEBUG)  # Allow all messages through logger
-        self.indigo_log_handler.setLevel(self.debug_level)  # Filter at handler level
-        self.plugin_file_handler.setLevel(logging.DEBUG)  # Log everything to file
+        self.logger.setLevel(self.debug_level)
         
         # Device tracking - maps device ID to device manager instance
         self.managed_devices: Dict[int, PlexServer] = {}
