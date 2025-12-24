@@ -286,7 +286,9 @@ class PlexServer:
         
         if client_key:
             self._child_devices[client_key] = client
-            self.logger.debug(f"Registered client {client_key} with server {self.device.name}")
+            self.logger.debug(f"Registered client '{client_key}' with server {self.device.name}")
+        else:
+            self.logger.warning(f"Cannot register client {device.name} - no plexClientId configured")
 
     def unregister_client(self, device: indigo.Device) -> None:
         """
@@ -347,7 +349,9 @@ class PlexServer:
     # ========================================================================
     def _do_status_update(self) -> None:
         """Execute server status update queries."""
+        self.logger.debug(f"Starting status update for {self.device.name}")
         base_url = self._get_base_url()
+        self.logger.debug(f"Base URL: {base_url}")
         headers = self._get_auth_headers()
         
         # Query server root for basic info

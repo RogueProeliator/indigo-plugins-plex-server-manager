@@ -5,6 +5,7 @@
 *.swo
 *~
 .DS_Store
+.work
 
 # Python
 __pycache__/

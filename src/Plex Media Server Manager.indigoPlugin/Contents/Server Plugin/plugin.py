@@ -73,7 +73,10 @@ class Plugin(indigo.PluginBase):
         self.plugin_file_handler.setFormatter(
             logging.Formatter(fmt=LOG_FORMAT, datefmt='%Y-%m-%d %H:%M:%S')
         )
-        self.indigo_log_handler.setLevel(self.debug_level)
+        # Set level on both the logger and handler
+        self.logger.setLevel(logging.DEBUG)  # Allow all messages through logger
+        self.indigo_log_handler.setLevel(self.debug_level)  # Filter at handler level
+        self.plugin_file_handler.setLevel(logging.DEBUG)  # Log everything to file
         
         # Device tracking - maps device ID to device manager instance
         self.managed_devices: Dict[int, PlexServer] = {}
@@ -135,12 +138,20 @@ class Plugin(indigo.PluginBase):
         self.sleep(1)  # Initial pause
         
         try:
+            loop_count = 0
             while True:
+                loop_count += 1
+                
+                # Log device count periodically
+                if loop_count % 30 == 1:  # Every ~60 seconds
+                    self.logger.debug(f"Concurrent thread running - {len(self.managed_devices)} managed devices")
+                
                 # Check each managed server device for status update
                 for dev_id, plex_server in list(self.managed_devices.items()):
                     try:
                         dev = indigo.devices.get(dev_id)
                         if dev and self._time_to_update(dev, plex_server):
+                            self.logger.debug(f"Time to update device: {dev.name}")
                             plex_server.queue_status_update()
                     except Exception as e:
                         self.logger.error(f"Error checking device {dev_id}: {e}")
@@ -175,6 +186,14 @@ class Plugin(indigo.PluginBase):
                 self.managed_devices[dev.id] = plex_server
                 plex_server.start()
                 
+                # Register any existing client devices that belong to this server
+                for client_dev_id, plex_client in self.client_devices.items():
+                    client_dev = plex_client.device
+                    client_server_id = int(client_dev.pluginProps.get('mediaServer', '0'))
+                    if client_server_id == dev.id:
+                        plex_server.register_client(client_dev, plex_client)
+                        self.logger.debug(f"Registered existing client {client_dev.name} with server {dev.name}")
+                
                 # Trigger state list refresh if needed
                 dev.stateListOrDisplayStateIdChanged()
                 
@@ -188,10 +207,14 @@ class Plugin(indigo.PluginBase):
                 plex_client = PlexClient(self, dev)
                 self.client_devices[dev.id] = plex_client
                 
-                # Register with parent server
+                # Register with parent server (if server is already running)
+                # If server starts later, it will register this client when it starts
                 media_server_id = int(dev.pluginProps.get('mediaServer', '0'))
                 if media_server_id in self.managed_devices:
                     self.managed_devices[media_server_id].register_client(dev, plex_client)
+                    self.logger.debug(f"Registered client {dev.name} with server (server already running)")
+                else:
+                    self.logger.debug(f"Server {media_server_id} not yet running, client {dev.name} will be registered when server starts")
                 
                 # Trigger state list refresh if needed
                 dev.stateListOrDisplayStateIdChanged()
@@ -389,7 +412,9 @@ class Plugin(indigo.PluginBase):
             self.debug_level = DEBUG_LEVEL_MAP.get(debug_level_str, logging.WARNING)
             self.indigo_log_handler.setLevel(self.debug_level)
             
-            self.logger.info("Plugin preferences saved")
+            self.logger.info(f"Plugin preferences saved - debug level set to {debug_level_str}")
+            if self.debug_level == logging.DEBUG:
+                self.logger.debug("Debug logging is now ENABLED")
         else:
             self.logger.debug("Plugin preferences cancelled")
 
