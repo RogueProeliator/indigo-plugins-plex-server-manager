@@ -461,6 +461,7 @@ class PlexServer:
             xml_text: XML response from server root
         """
         try:
+            self.logger.threaddebug(f"Parsing received Server Info XML: {xml_text}")
             container = PlexMediaContainer(xml_text, '/')
             
             if container.container_type == MEDIACONTAINERTYPE_SERVERNODE:
@@ -485,6 +486,7 @@ class PlexServer:
             xml_text: XML response from /clients endpoint
         """
         try:
+            self.logger.threaddebug(f"Parsing received Client List XML: {xml_text}")
             container = PlexMediaContainer(xml_text, '/clients')
             
             if container.container_type == MEDIACONTAINERTYPE_CLIENTLIST:
@@ -527,6 +529,7 @@ class PlexServer:
             xml_text: XML response from /status/sessions endpoint
         """
         try:
+            self.logger.threaddebug(f"Parsing received Sessions XML: {xml_text}")
             container = PlexMediaContainer(xml_text, '/status/sessions')
             
             if container.container_type != MEDIACONTAINERTYPE_SESSIONLIST:
@@ -775,6 +778,7 @@ class PlexServer:
         """
         try:
             # Parse as generic container to get directory info
+            self.logger.threaddebug(f"Parsing received Metadata XML: {xml_text}")
             container = PlexMediaContainer(xml_text, '/library')
             
             for media_dir in container.directories:

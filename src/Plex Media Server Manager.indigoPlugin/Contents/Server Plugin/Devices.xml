@@ -5,7 +5,7 @@
 	<Device type="custom" id="plexMediaServer">
 		<Name>Plex Media Server</Name>
 		<ConfigUI>
-			<Field id="commOptionsTitle" type="label" fontColor="darkGray" fontSize="small">
+			<Field id="commOptionsTitle" type="label">
 				<Label>CONNECTION OPTIONS</Label>
 			</Field>
 			<Field id="instructionSeparator1" type="separator" />
@@ -93,11 +93,7 @@
 	<Device type="custom" id="plexMediaClient">
 		<Name>Plex Media Client</Name>
 		<ConfigUI>
-			<Field id="identifyOptionsTitle" type="label" fontColor="darkGray">
-				<Label>CLIENT IDENTIFICATION</Label>
-			</Field>
-			<Field id="instructionSeparator1" type="separator" />
-			<Field id="clientIdInstructions" type="label" fontSize="small">
+			<Field id="clientIdInstructions" type="label">
 				<Label>Use this device to specify a specific client whose state you wish to track in Indigo. To do this, your client must be connected to the Plex Media Server (e.g. browsing the library in app or playing some media). Select your target media server and click the load button to retrieve the list of clients available.</Label>
 			</Field>
 			<Field id="mediaServer" type="menu">
@@ -301,11 +297,7 @@
 	<Device type="custom" id="plexMediaClientSlot">
 		<Name>Plex Media Client Slot</Name>
 		<ConfigUI>
-			<Field id="identifyOptionsTitle" type="label" fontColor="darkGray">
-				<Label>CLIENT SLOT</Label>
-			</Field>
-			<Field id="instructionSeparator1" type="separator" />
-			<Field id="clientIdInstructions" type="label" fontSize="small">
+			<Field id="clientIdInstructions" type="label">
 				<Label>Use this device to capture the data from connected clients regardless of their client id. This is useful to show, for example, all connections to your server. The slots are numbered with the first connected client in Slot 1, second in Slot 2, etc.</Label>
 			</Field>
 			<Field id="mediaServer" type="menu">
