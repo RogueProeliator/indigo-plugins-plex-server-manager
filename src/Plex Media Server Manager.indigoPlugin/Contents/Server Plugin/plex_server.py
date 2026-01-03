@@ -97,6 +97,7 @@ class PlexServer:
         # Status tracking
         self.bad_calls = 0
         self.last_update_time: float = 0
+        self._connection_error_logged = False  # Track if we've already logged a connection error
         
         # Client tracking
         self._current_client_list: List[Tuple[str, str]] = []
@@ -354,15 +355,22 @@ class PlexServer:
         self.logger.debug(f"Base URL: {base_url}")
         headers = self._get_auth_headers()
         
-        # Query server root for basic info
+        # Query server root for basic info - if this fails, abort the entire update
         try:
             response = self._get(f"{base_url}/", headers)
-            if response:
-                self._handle_server_info_response(response.text)
+            if response is None:
+                # Connection failed - _get already handled logging and state update
+                return
+            self._handle_server_info_response(response.text)
         except Exception as e:
             self.logger.error(f"Error getting server info: {e}")
             self._handle_connection_error()
             return
+        
+        # Connection successful - reset error tracking
+        if self._connection_error_logged:
+            self.logger.info(f"Connection restored to {self.device.name}")
+            self._connection_error_logged = False
         
         # Query client list
         try:
@@ -853,12 +861,12 @@ class PlexServer:
                 self._security_token = ''
             
             return response
-        except requests.exceptions.ConnectionError as e:
-            self.logger.warning(f"Connection error: {e}")
+        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout) as e:
+            # Only log the warning once until connection is restored
+            if not self._connection_error_logged:
+                self.logger.warning(f"Connection error to {self.device.name}: {e}")
+                self._connection_error_logged = True
             self._handle_connection_error()
-            return None
-        except requests.exceptions.Timeout:
-            self.logger.warning(f"Timeout connecting to {url}")
             return None
         except Exception as e:
             self.logger.error(f"HTTP GET error: {e}")
@@ -917,11 +925,12 @@ class PlexServer:
     # region Error Handling
     # ========================================================================
     def _handle_connection_error(self) -> None:
-        """Handle connection errors."""
+        """Handle connection errors - immediately set device to Disconnected state."""
         self.bad_calls += 1
         
-        if self.bad_calls >= self.MAX_BAD_CALLS:
-            self.logger.warning(f"Device {self.device.name} has failed {self.bad_calls} consecutive calls")
+        # Immediately update state to Disconnected on any connection error
+        current_state = self.device.states.get('connectionState', '')
+        if current_state != 'Disconnected':
             self.device.updateStateOnServer('connectionState', value='Disconnected')
 
     # endregion
